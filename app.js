@@ -1972,7 +1972,7 @@
         const choiceResult = await deferredInstallPrompt.userChoice;
         if (choiceResult.outcome === 'accepted') {
           hidePwaInstallToast();
-          showToast('Vocational Intelligence সফলভাবে ইনস্টল হচ্ছে!');
+          showToast('VocAI সফলভাবে ইনস্টল হচ্ছে!');
         }
         deferredInstallPrompt = null;
       } catch (err) {
@@ -2021,7 +2021,7 @@
       deferredInstallPrompt = null;
       hidePwaInstallToast();
       if (headerInstallBtn) headerInstallBtn.classList.add('hidden');
-      showToast('অভিনন্দন! Vocational Intelligence অ্যাপটি ইনস্টল সম্পন্ন হয়েছে।');
+      showToast('অভিনন্দন! VocAI অ্যাপটি ইনস্টল সম্পন্ন হয়েছে।');
     });
 
     // 4. Bind button clicks

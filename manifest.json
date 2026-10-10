@@ -1,7 +1,7 @@
 {
   "id": "./",
-  "name": "Vocational Intelligence — ভোকেশনাল প্রশ্নব্যাংক",
-  "short_name": "Vocational Intelligence",
+  "name": "VocAI",
+  "short_name": "VocAI",
   "description": "বাংলাদেশ কারিগরি শিক্ষা বোর্ড (বাকাশিবো) — নবম ও দশম শ্রেণি IoT Basics (ট্রেড ১–৪) স্মার্ট প্রশ্নব্যাংক ও সাজেশন",
   "start_url": "./",
   "scope": "./",

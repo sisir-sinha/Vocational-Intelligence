@@ -1,4 +1,4 @@
-const CACHE_NAME = 'vocational-intelligence-v3';
+const CACHE_NAME = 'vocai-pwa-v4';
 const CORE_ASSETS = [
   './',
   './index.html',
