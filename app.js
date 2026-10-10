@@ -1365,7 +1365,7 @@
   }
 
   function formatQuestionForCopy(q) {
-    let line = `${q.q_no_bn}। ${q.question}`;
+    let line = `${q.question}`;
     if (q.main_years && q.main_years.length) {
       line += ` [${formatBoardYearsText(q.main_years)}]`;
     }
@@ -3205,27 +3205,31 @@
   // PWA Service Worker & Long-Duration Launch Install Toast
   let deferredInstallPrompt = null;
   let installToastTimer = null;
+  let isInstallToastVisible = false;
 
   function isRunningStandalone() {
     return (
       window.matchMedia('(display-mode: standalone)').matches ||
-      window.navigator.standalone === true
+      window.matchMedia('(display-mode: window-controls-overlay)').matches ||
+      window.matchMedia('(display-mode: fullscreen)').matches ||
+      window.navigator.standalone === true ||
+      document.referrer.includes('android-app://')
     );
   }
 
   function showPwaInstallToast(durationMs = 30000) {
-    if (isRunningStandalone()) return;
+    if (isRunningStandalone() || !deferredInstallPrompt) return;
     const toastEl = document.getElementById('pwa-install-toast');
     const progressEl = document.getElementById('pwa-install-progress');
     if (!toastEl) return;
 
+    isInstallToastVisible = true;
     toastEl.classList.remove('translate-y-28', 'opacity-0', 'pointer-events-none');
     toastEl.classList.add('translate-y-0', 'opacity-100');
 
     if (progressEl) {
       progressEl.style.transition = 'none';
       progressEl.style.width = '100%';
-      // Trigger reflow then animate width to 0 over durationMs
       void progressEl.offsetWidth;
       progressEl.style.transition = `width ${durationMs}ms linear`;
       progressEl.style.width = '0%';
@@ -3240,6 +3244,7 @@
   function hidePwaInstallToast() {
     const toastEl = document.getElementById('pwa-install-toast');
     if (!toastEl) return;
+    isInstallToastVisible = false;
     toastEl.classList.add('translate-y-28', 'opacity-0', 'pointer-events-none');
     toastEl.classList.remove('translate-y-0', 'opacity-100');
     if (installToastTimer) {
@@ -3249,21 +3254,30 @@
   }
 
   async function triggerPwaInstall() {
-    if (deferredInstallPrompt) {
-      try {
-        deferredInstallPrompt.prompt();
-        const choiceResult = await deferredInstallPrompt.userChoice;
-        if (choiceResult.outcome === 'accepted') {
-          hidePwaInstallToast();
-          showToast('VocAI সফলভাবে ইনস্টল হচ্ছে!');
+    if (!deferredInstallPrompt) {
+      hidePwaInstallToast();
+      return;
+    }
+    try {
+      const promptEvent = deferredInstallPrompt;
+      deferredInstallPrompt = null;
+      await promptEvent.prompt();
+      const choiceResult = await promptEvent.userChoice;
+      if (choiceResult.outcome === 'accepted') {
+        try { localStorage.setItem('vocai_pwa_installed', 'true'); } catch (e) {}
+        hidePwaInstallToast();
+        const headerInstallBtn = document.getElementById('header-install-btn');
+        if (headerInstallBtn) {
+          headerInstallBtn.classList.add('hidden');
+          headerInstallBtn.classList.remove('inline-flex');
         }
-        deferredInstallPrompt = null;
-      } catch (err) {
-        console.error('Install prompt error:', err);
+        showToast('VocAI সফলভাবে ইনস্টল হচ্ছে!');
+      } else {
+        hidePwaInstallToast();
       }
-    } else {
-      // Fallback guidance if browser hasn't fired beforeinstallprompt yet
-      showToast('ব্রাউজারের ⋮ মেনু বা অ্যাড্রেস বারের ইনস্টল আইকন থেকে "Install app" বা "Add to Home screen"-এ ক্লিক করুন');
+    } catch (err) {
+      console.error('Install prompt error:', err);
+      hidePwaInstallToast();
     }
   }
 
@@ -3283,27 +3297,55 @@
     const toastEl = document.getElementById('pwa-install-toast');
     const progressEl = document.getElementById('pwa-install-progress');
 
-    if (isRunningStandalone() && headerInstallBtn) {
+    // Always start with install button & toast hidden until browser confirms app is NOT installed
+    if (headerInstallBtn) {
       headerInstallBtn.classList.add('hidden');
+      headerInstallBtn.classList.remove('inline-flex');
+    }
+    if (isRunningStandalone()) {
+      try { localStorage.setItem('vocai_pwa_installed', 'true'); } catch (e) {}
+      hidePwaInstallToast();
+      return;
     }
 
-    // 2. Capture Chrome's beforeinstallprompt event
-    window.addEventListener('beforeinstallprompt', (e) => {
+    // 2. Capture Chrome's beforeinstallprompt event (ONLY fires when PWA is NOT installed)
+    window.addEventListener('beforeinstallprompt', async (e) => {
       e.preventDefault();
+      if (isRunningStandalone()) return;
+
+      // Double-check via getInstalledRelatedApps if supported
+      if ('getInstalledRelatedApps' in navigator) {
+        try {
+          const relatedApps = await navigator.getInstalledRelatedApps();
+          if (relatedApps && relatedApps.length > 0) {
+            return;
+          }
+        } catch (err) {}
+      }
+
       deferredInstallPrompt = e;
+      try { localStorage.removeItem('vocai_pwa_installed'); } catch (err) {}
+
       if (headerInstallBtn) {
         headerInstallBtn.classList.remove('hidden');
         headerInstallBtn.classList.add('inline-flex');
       }
-      // Show or refresh the long-duration install toast (30 seconds)
-      showPwaInstallToast(30000);
+
+      // Show the long-duration (30s) install toast on launch only if not already visible
+      if (!isInstallToastVisible) {
+        showPwaInstallToast(30000);
+      }
     });
 
-    // 3. Hide install UI once installed
+    // 3. Hide install UI immediately once installed
     window.addEventListener('appinstalled', () => {
       deferredInstallPrompt = null;
+      try { localStorage.setItem('vocai_pwa_installed', 'true'); } catch (e) {}
       hidePwaInstallToast();
-      if (headerInstallBtn) headerInstallBtn.classList.add('hidden');
+      if (headerInstallBtn) {
+        headerInstallBtn.classList.add('hidden');
+        headerInstallBtn.classList.remove('inline-flex');
+      }
       showToast('অভিনন্দন! VocAI অ্যাপটি ইনস্টল সম্পন্ন হয়েছে।');
     });
 
@@ -3331,15 +3373,10 @@
         }
       });
       toastEl.addEventListener('mouseleave', () => {
-        showPwaInstallToast(20000);
+        if (isInstallToastVisible && deferredInstallPrompt) {
+          showPwaInstallToast(20000);
+        }
       });
-    }
-
-    // 5. On launch, immediately show the long-duration install toast (30 seconds)
-    if (!isRunningStandalone()) {
-      setTimeout(() => {
-        showPwaInstallToast(30000);
-      }, 600);
     }
   }
 
