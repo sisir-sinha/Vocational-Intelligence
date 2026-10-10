@@ -1028,6 +1028,18 @@
             }
             <button
               type="button"
+              data-qb-quick-add="${q.id}"
+              class="qb-quick-add-btn w-8 h-8 rounded-xl flex items-center justify-center border transition-all ${
+                isInQuestionPaper(q.id)
+                  ? 'bg-emerald-50 dark:bg-emerald-950/80 border-emerald-400 dark:border-emerald-700 text-emerald-600 dark:text-emerald-400 shadow-2xs'
+                  : 'bg-slate-50 dark:bg-slate-700/60 border-slate-200 dark:border-slate-600 text-slate-400 hover:text-amber-500 hover:border-amber-400'
+              }"
+              title="${isInQuestionPaper(q.id) ? 'প্রশ্নপত্রে যুক্ত আছে (সরাতে ক্লিক করুন)' : 'প্রশ্নপত্রে যোগ করুন (Make Question)'}"
+            >
+              <i class="fa-solid ${isInQuestionPaper(q.id) ? 'fa-check' : 'fa-file-circle-plus'} text-sm"></i>
+            </button>
+            <button
+              type="button"
               data-star-id="${q.id}"
               class="star-toggle-btn w-8 h-8 rounded-xl flex items-center justify-center border transition-all ${
                 isStarred
@@ -1294,6 +1306,16 @@
         } else {
           state.collapsedGroups.add(key);
         }
+        renderAll();
+      });
+    });
+
+    // Quick Add to Question Paper buttons
+    container.querySelectorAll('.qb-quick-add-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const qid = btn.getAttribute('data-qb-quick-add');
+        toggleQuestionInPaperById(qid);
         renderAll();
       });
     });
@@ -1925,11 +1947,1259 @@
       if (e.key === 'Escape') {
         closeModal('analytics-modal');
         closeModal('import-modal');
+        closeModal('question-builder-modal');
         hidePwaInstallToast();
       }
     });
 
     initPwaInstallFeature();
+    initQuestionBuilder();
+  }
+
+  // ============================================================================
+  // MAKE QUESTION STUDIO (প্রশ্নপত্র তৈরি ও ড্র্যাগ-অ্যান্ড-ড্রপ বিল্ডার)
+  // ============================================================================
+  const qbState = {
+    tradeId: 'trade-3',
+    chapterKey: 'all',
+    qType: 'short', // 'very_short', 'short', 'broad', 'mixed_board', 'all'
+    targetMarks: 10,
+    examName: 'শ্রেণি অভীক্ষা (Class Test) - ২০২৬',
+    examTime: '৩০ মিনিট',
+    institution: 'বাংলাদেশ কারিগরি শিক্ষা বোর্ড / ভোকেশনাল ইনস্টিটিউট',
+    instruction: '[দ্রষ্টব্য: ডান পাশের সংখ্যা প্রশ্নের পূর্ণমান জ্ঞাপক। সকল প্রশ্নের উত্তর দাও।]',
+    showBoardTags: false,
+    poolSearch: '',
+    poolPriority: 'all', // 'all', 'top', 'board', '2026', 'starred'
+    mobileTab: 'paper', // 'pool' or 'paper'
+    editingItemId: null, // item uid currently in inline edit mode
+    generationSeed: 0,
+    items: [] // Array of { uid, sourceId, question, altQuestion, marks, base_type, board_years, chapter, trade_id }
+  };
+
+  function getDefaultMarkForType(baseType) {
+    if (baseType === 'very_short') return 1;
+    if (baseType === 'short') return 2;
+    if (baseType === 'broad') return 4;
+    if (baseType === 'practical') return 5;
+    return 2;
+  }
+
+  function loadQbStateFromStorage() {
+    try {
+      const saved = localStorage.getItem('vi_qb_state_v1');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed && typeof parsed === 'object') {
+          if (Array.isArray(parsed.items)) qbState.items = parsed.items;
+          if (parsed.institution) qbState.institution = parsed.institution;
+          if (parsed.examName) qbState.examName = parsed.examName;
+          if (parsed.examTime) qbState.examTime = parsed.examTime;
+          if (parsed.targetMarks) qbState.targetMarks = parsed.targetMarks;
+          if (parsed.instruction) qbState.instruction = parsed.instruction;
+          if (typeof parsed.showBoardTags === 'boolean') qbState.showBoardTags = parsed.showBoardTags;
+        }
+      }
+    } catch (e) {
+      console.error('QB load error:', e);
+    }
+    updateHeaderBuilderBadge();
+  }
+
+  function saveQbStateToStorage() {
+    try {
+      localStorage.setItem('vi_qb_state_v1', JSON.stringify({
+        items: qbState.items,
+        institution: qbState.institution,
+        examName: qbState.examName,
+        examTime: qbState.examTime,
+        targetMarks: qbState.targetMarks,
+        instruction: qbState.instruction,
+        showBoardTags: qbState.showBoardTags
+      }));
+    } catch (e) {}
+    updateHeaderBuilderBadge();
+  }
+
+  function updateHeaderBuilderBadge() {
+    const badge = document.getElementById('builder-count-badge');
+    if (badge) {
+      badge.textContent = toBnNum(qbState.items.length);
+    }
+  }
+
+  function isInQuestionPaper(qid) {
+    return qbState.items.some(item => item.sourceId === qid);
+  }
+
+  function createPaperItemFromQuestion(q, customMarks) {
+    const marks = customMarks !== undefined ? customMarks : getDefaultMarkForType(q.base_type);
+    const firstAlt = q.alternatives && q.alternatives.length > 0 ? q.alternatives[0].text : '';
+    return {
+      uid: `pitem-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      sourceId: q.id,
+      question: q.question,
+      altQuestion: firstAlt,
+      marks: Number(marks) || 2,
+      base_type: q.base_type,
+      board_years: q.board_years || [],
+      chapter: q.chapter || '',
+      trade_id: q.trade_id || 'trade-3'
+    };
+  }
+
+  function toggleQuestionInPaperById(qid) {
+    const existingIdx = qbState.items.findIndex(item => item.sourceId === qid);
+    if (existingIdx !== -1) {
+      qbState.items.splice(existingIdx, 1);
+      saveQbStateToStorage();
+      showToast('প্রশ্নপত্র থেকে প্রশ্নটি সরানো হয়েছে');
+    } else {
+      const q = state.questions.find(item => item.id === qid);
+      if (!q) return;
+      qbState.items.push(createPaperItemFromQuestion(q));
+      saveQbStateToStorage();
+      showToast('প্রশ্নপত্রে প্রশ্নটি যুক্ত হয়েছে! ("প্রশ্নপত্র তৈরি" বাটনে ক্লিক করে দেখুন)');
+    }
+  }
+
+  // Populate Chapter Select inside Question Builder based on selected Trade
+  function renderQbChapterOptions() {
+    const chSelect = document.getElementById('qb-chapter-select');
+    if (!chSelect) return;
+
+    const pool = state.questions.filter(q => qbState.tradeId === 'all' || q.trade_id === qbState.tradeId);
+    const chMap = new Map();
+    pool.forEach(q => {
+      const k = `${q.trade_id}::${q.chapter}`;
+      if (!chMap.has(k)) {
+        chMap.set(k, {
+          key: k,
+          trade_id: q.trade_id,
+          chapter: q.chapter,
+          chapter_num: q.chapter_num,
+          count: 0
+        });
+      }
+      chMap.get(k).count++;
+    });
+
+    const chapters = Array.from(chMap.values()).sort((a, b) => {
+      if (a.trade_id !== b.trade_id) return a.trade_id.localeCompare(b.trade_id);
+      return a.chapter_num - b.chapter_num;
+    });
+
+    // If current chapterKey doesn't belong to selected trade, select first chapter or 'all'
+    const validKeys = new Set(chapters.map(c => c.key));
+    if (qbState.chapterKey !== 'all' && !validKeys.has(qbState.chapterKey)) {
+      qbState.chapterKey = chapters.length > 0 ? chapters[0].key : 'all';
+    }
+
+    let html = `<option class="bg-slate-900 text-white" value="all" ${qbState.chapterKey === 'all' ? 'selected' : ''}>সকল অধ্যায় (${toBnNum(pool.length)}টি প্রশ্ন)</option>`;
+    chapters.forEach(ch => {
+      const prefix = qbState.tradeId === 'all' ? `[${getShortTradeBadge(ch.trade_id)}] ` : '';
+      html += `<option class="bg-slate-900 text-white" value="${escapeHtml(ch.key)}" ${qbState.chapterKey === ch.key ? 'selected' : ''}>${escapeHtml(prefix + ch.chapter)} (${toBnNum(ch.count)})</option>`;
+    });
+
+    chSelect.innerHTML = html;
+  }
+
+  // Filter candidate questions for Question Builder Pool & Auto-Generator
+  function getQbCandidatePool(overrideType) {
+    const typeToMatch = overrideType || qbState.qType;
+    return state.questions.filter(q => {
+      if (qbState.tradeId !== 'all' && q.trade_id !== qbState.tradeId) return false;
+      if (qbState.chapterKey !== 'all') {
+        const k = `${q.trade_id}::${q.chapter}`;
+        if (k !== qbState.chapterKey && q.chapter !== qbState.chapterKey) return false;
+      }
+      if (typeToMatch !== 'all' && typeToMatch !== 'mixed_board') {
+        if (q.base_type !== typeToMatch) return false;
+      }
+      return true;
+    });
+  }
+
+  // Smart Auto-Generation of Exam Question Paper
+  function autoGenerateExamPaper(appendMode = false) {
+    syncQbInputsToState();
+    qbState.generationSeed++;
+
+    const targetMarks = Math.max(1, parseInt(qbState.targetMarks, 10) || 10);
+    const existingIds = new Set(appendMode ? qbState.items.map(i => i.sourceId) : []);
+
+    // Helper to pick questions from a pool up to `marksBudget`
+    function pickQuestionsForBudget(pool, unitMark, marksBudget) {
+      // Sort candidates by importance_score + starred + slight rotation so repeated clicks give smart variety
+      const available = pool.filter(q => !existingIds.has(q.id));
+      const scored = available.map((q, idx) => {
+        const starBonus = state.starredIds.has(q.id) ? 80 : 0;
+        const boardBonus = (q.board_years && q.board_years.length > 0) ? 45 : 0;
+        const cycleOffset = ((idx + qbState.generationSeed * 3) % 7) * 6;
+        return {
+          q,
+          rankScore: (q.importance_score || 0) + starBonus + boardBonus + cycleOffset
+        };
+      });
+      scored.sort((a, b) => b.rankScore - a.rankScore);
+
+      const picked = [];
+      let remaining = marksBudget;
+      for (const entry of scored) {
+        if (remaining <= 0) break;
+        const m = remaining >= unitMark ? unitMark : remaining;
+        picked.push(createPaperItemFromQuestion(entry.q, m));
+        existingIds.add(entry.q.id);
+        remaining -= m;
+      }
+      return picked;
+    }
+
+    let generatedItems = [];
+
+    if (qbState.qType === 'mixed_board') {
+      // Split marks across অতি সংক্ষিপ্ত (1), সংক্ষিপ্ত (2), রচনামূলক (4)
+      const vsBudget = Math.max(2, Math.round(targetMarks * 0.33));
+      const sBudget = Math.max(2, Math.round(targetMarks * 0.33));
+      const bBudget = Math.max(0, targetMarks - vsBudget - sBudget);
+
+      const vsPool = getQbCandidatePool('very_short');
+      const sPool = getQbCandidatePool('short');
+      const bPool = getQbCandidatePool('broad');
+
+      generatedItems = [
+        ...pickQuestionsForBudget(vsPool, 1, vsBudget),
+        ...pickQuestionsForBudget(sPool, 2, sBudget),
+        ...(bBudget > 0 ? pickQuestionsForBudget(bPool, 4, bBudget) : [])
+      ];
+      qbState.instruction = `[দ্রষ্টব্য: ডান পাশের সংখ্যা প্রশ্নের পূর্ণমান জ্ঞাপক। সকল প্রশ্নের উত্তর দাও।]`;
+    } else {
+      const pool = getQbCandidatePool(qbState.qType);
+      const unitMark = qbState.qType === 'all' ? 2 : getDefaultMarkForType(qbState.qType);
+      generatedItems = pickQuestionsForBudget(pool, unitMark, targetMarks);
+
+      const count = generatedItems.length;
+      if (count > 0) {
+        const typeLabel = TYPE_META[qbState.qType]?.fullLabel || 'প্রশ্নোত্তর';
+        qbState.instruction = `[দ্রষ্টব্য: ডান পাশের সংখ্যা প্রশ্নের পূর্ণমান জ্ঞাপক। সকল প্রশ্নের উত্তর দাও। (${typeLabel}: ${toBnNum(unitMark)}×${toBnNum(count)}=${toBnNum(targetMarks)})]`;
+      }
+    }
+
+    if (generatedItems.length === 0) {
+      showToast('নির্বাচিত ফিল্টারে পর্যাপ্ত প্রশ্ন পাওয়া যায়নি। অন্য অধ্যায় বা ধরন নির্বাচন করুন।');
+      return;
+    }
+
+    if (appendMode) {
+      qbState.items = [...qbState.items, ...generatedItems];
+      showToast(`প্রশ্নপত্রে আরও ${toBnNum(generatedItems.length)}টি প্রশ্ন যোগ করা হয়েছে!`);
+    } else {
+      qbState.items = generatedItems;
+      showToast(`সফলভাবে ${toBnNum(generatedItems.length)}টি প্রশ্নের (${toBnNum(targetMarks)} নম্বর) প্রশ্নপত্র তৈরি হয়েছে!`);
+    }
+
+    const instInput = document.getElementById('qb-instruction-input');
+    if (instInput) instInput.value = qbState.instruction;
+
+    saveQbStateToStorage();
+    renderQbAll();
+    renderAll();
+  }
+
+  function syncQbInputsToState() {
+    const tradeEl = document.getElementById('qb-trade-select');
+    const chEl = document.getElementById('qb-chapter-select');
+    const typeEl = document.getElementById('qb-type-select');
+    const marksEl = document.getElementById('qb-total-marks-input');
+    const examNameEl = document.getElementById('qb-exam-name-input');
+    const timeEl = document.getElementById('qb-exam-time-input');
+    const instNameEl = document.getElementById('qb-institution-input');
+    const instrEl = document.getElementById('qb-instruction-input');
+    const showBoardEl = document.getElementById('qb-show-board-tags');
+
+    if (tradeEl) qbState.tradeId = tradeEl.value;
+    if (chEl) qbState.chapterKey = chEl.value;
+    if (typeEl) qbState.qType = typeEl.value;
+    if (marksEl) qbState.targetMarks = parseInt(marksEl.value, 10) || 10;
+    if (examNameEl) qbState.examName = examNameEl.value.trim() || 'শ্রেণি অভীক্ষা - ২০২৬';
+    if (timeEl) qbState.examTime = timeEl.value.trim() || '৩০ মিনিট';
+    if (instNameEl) qbState.institution = instNameEl.value.trim() || 'বাংলাদেশ কারিগরি শিক্ষা বোর্ড / ভোকেশনাল ইনস্টিটিউট';
+    if (instrEl) qbState.instruction = instrEl.value.trim();
+    if (showBoardEl) qbState.showBoardTags = showBoardEl.checked;
+  }
+
+  // Render Left Pane: Suggested Draggable Question Pool
+  function renderQbPool() {
+    const listEl = document.getElementById('qb-pool-list');
+    const countBadge = document.getElementById('qb-pool-count-badge');
+    const mobilePoolCount = document.getElementById('qb-mobile-pool-count');
+    if (!listEl) return;
+
+    let candidates = getQbCandidatePool();
+
+    // Filter by priority dropdown
+    if (qbState.poolPriority === 'top') {
+      candidates = candidates.filter(q => q.importance_tier === 'top');
+    } else if (qbState.poolPriority === 'board') {
+      candidates = candidates.filter(q => q.board_years && q.board_years.length > 0);
+    } else if (qbState.poolPriority === '2026') {
+      candidates = candidates.filter(q => q.board_years && q.board_years.includes(2026));
+    } else if (qbState.poolPriority === 'starred') {
+      candidates = candidates.filter(q => state.starredIds.has(q.id));
+    }
+
+    // Filter by pool search query
+    const expandedSearch = getExpandedSearchTerms(qbState.poolSearch);
+    if (expandedSearch.length > 0) {
+      candidates = candidates.filter(q => matchesSearch(q, expandedSearch));
+    }
+
+    // Sort pool: top important & board questions first
+    candidates.sort((a, b) => (b.importance_score || 0) - (a.importance_score || 0));
+
+    if (countBadge) countBadge.textContent = `${toBnNum(candidates.length)}টি প্রশ্ন`;
+    if (mobilePoolCount) mobilePoolCount.textContent = toBnNum(candidates.length);
+
+    if (candidates.length === 0) {
+      listEl.innerHTML = `
+        <div class="p-6 text-center text-xs text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-800/60 rounded-xl border border-dashed border-slate-300 dark:border-slate-700">
+          এই ফিল্টারে কোনো সাজেশন প্রশ্ন পাওয়া যায়নি।
+        </div>
+      `;
+      return;
+    }
+
+    listEl.innerHTML = candidates.map(q => {
+      const inPaper = isInQuestionPaper(q.id);
+      const tMeta = TYPE_META[q.base_type] || TYPE_META['short'];
+      const defaultMark = getDefaultMarkForType(q.base_type);
+      const hasBoard = q.board_years && q.board_years.length > 0;
+      const isTop = q.importance_tier === 'top';
+
+      return `
+        <div
+          draggable="true"
+          data-pool-qid="${q.id}"
+          class="qb-pool-card cursor-grab active:cursor-grabbing bg-white dark:bg-slate-800/95 rounded-xl p-3 border ${
+            inPaper
+              ? 'border-emerald-500/60 bg-emerald-50/20 dark:bg-emerald-950/20'
+              : isTop
+              ? 'border-rose-500/40 hover:border-indigo-500'
+              : 'border-slate-200 dark:border-slate-700 hover:border-indigo-500'
+          } shadow-2xs transition-all select-none"
+        >
+          <div class="flex items-center justify-between gap-1.5 mb-1.5">
+            <div class="flex flex-wrap items-center gap-1">
+              <span class="text-[11px] font-bold px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
+                <i class="fa-solid fa-grip-vertical text-slate-400 mr-1"></i>${escapeHtml(tMeta.label)} (${toBnNum(defaultMark)})
+              </span>
+              ${
+                isTop
+                  ? `<span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-rose-500/15 text-rose-500">★★★</span>`
+                  : ''
+              }
+              ${
+                hasBoard
+                  ? `<span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-500">[${formatBoardYearsText(q.board_years)}]</span>`
+                  : ''
+              }
+            </div>
+            <div class="flex items-center gap-1 shrink-0">
+              ${
+                inPaper
+                  ? `<span class="text-[11px] font-bold text-emerald-500 px-1.5 py-0.5"><i class="fa-solid fa-check mr-0.5"></i>যুক্ত</span>`
+                  : ''
+              }
+              <button
+                type="button"
+                data-pool-add-alt="${q.id}"
+                class="pool-add-alt-btn px-2 py-0.5 rounded-lg text-[11px] font-bold bg-purple-500/15 hover:bg-purple-500/30 text-purple-400 border border-purple-500/30 transition-colors"
+                title="সর্বশেষ প্রশ্নের ‘অথবা’ (বিকল্প প্রশ্ন) হিসেবে যুক্ত করুন"
+              >
+                +অথবা
+              </button>
+              <button
+                type="button"
+                data-pool-add="${q.id}"
+                class="pool-add-btn px-2.5 py-0.5 rounded-lg text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white shadow-2xs transition-colors"
+                title="প্রশ্নপত্রে যোগ করুন"
+              >
+                <i class="fa-solid fa-plus mr-0.5"></i>যোগ
+              </button>
+            </div>
+          </div>
+
+          <div class="text-sm sm:text-[15px] font-semibold text-slate-800 dark:text-slate-100 leading-snug">
+            ${escapeHtml(q.question)}
+          </div>
+          ${
+            q.alternatives && q.alternatives.length > 0
+              ? `<div class="mt-1 text-xs text-slate-500 dark:text-slate-400 truncate">
+                  <strong class="text-indigo-400">অথবা:</strong> ${escapeHtml(q.alternatives[0].text)}
+                </div>`
+              : ''
+          }
+        </div>
+      `;
+    }).join('');
+
+    // Bind Pool Card Drag & Click Events
+    listEl.querySelectorAll('.qb-pool-card').forEach(card => {
+      card.addEventListener('dragstart', (e) => {
+        const qid = card.getAttribute('data-pool-qid');
+        e.dataTransfer.setData('text/plain', JSON.stringify({ type: 'pool-question', qid }));
+        e.dataTransfer.effectAllowed = 'copy';
+        card.classList.add('qb-item-dragging');
+      });
+      card.addEventListener('dragend', () => {
+        card.classList.remove('qb-item-dragging');
+      });
+    });
+
+    listEl.querySelectorAll('.pool-add-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const qid = btn.getAttribute('data-pool-add');
+        const q = state.questions.find(item => item.id === qid);
+        if (!q) return;
+        qbState.items.push(createPaperItemFromQuestion(q));
+        saveQbStateToStorage();
+        renderQbAll();
+        renderAll();
+        showToast('প্রশ্নপত্রে প্রশ্নটি যোগ করা হয়েছে!');
+      });
+    });
+
+    listEl.querySelectorAll('.pool-add-alt-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const qid = btn.getAttribute('data-pool-add-alt');
+        const q = state.questions.find(item => item.id === qid);
+        if (!q) return;
+        if (qbState.items.length === 0) {
+          qbState.items.push(createPaperItemFromQuestion(q));
+          showToast('প্রশ্নপত্রে প্রথম প্রশ্ন হিসেবে যোগ করা হয়েছে');
+        } else {
+          const lastItem = qbState.items[qbState.items.length - 1];
+          lastItem.altQuestion = q.question;
+          showToast(`প্রশ্ন ${toBnNum(qbState.items.length)}-এর ‘অথবা’ হিসেবে যুক্ত করা হয়েছে!`);
+        }
+        saveQbStateToStorage();
+        renderQbAll();
+      });
+    });
+  }
+
+  // Render Right Pane: Live Exam Question Paper Preview & Editor
+  function renderQbPaper() {
+    syncQbInputsToState();
+
+    // Update Paper Header Titles
+    const titleEl = document.getElementById('qb-paper-exam-title');
+    const subjEl = document.getElementById('qb-paper-subject-line');
+    const timeEl = document.getElementById('qb-paper-time-display');
+    const marksEl = document.getElementById('qb-paper-marks-display');
+
+    const statQCount = document.getElementById('qb-stat-qcount');
+    const statTargetMarks = document.getElementById('qb-stat-target-marks');
+    const statCurrentMarks = document.getElementById('qb-stat-current-marks');
+    const mobilePaperCount = document.getElementById('qb-mobile-paper-count');
+
+    const totalCurrentMarks = qbState.items.reduce((sum, item) => sum + (Number(item.marks) || 0), 0);
+
+    if (titleEl) titleEl.textContent = qbState.examName;
+
+    const tradeMeta = TRADES_META[qbState.tradeId] || TRADES_META['trade-3'];
+    const chLabel = qbState.chapterKey === 'all'
+      ? 'সকল অধ্যায়'
+      : (qbState.chapterKey.includes('::') ? qbState.chapterKey.split('::')[1] : qbState.chapterKey);
+    const codeMap = {
+      'trade-1': 'বিষয় কোড: ৮৮২১/৫৮৮২১',
+      'trade-2': 'বিষয় কোড: ৮৮২২/৫৮৮২২',
+      'trade-3': 'বিষয় কোড: ৮৮২৩/৫৮৮২৩',
+      'trade-4': 'বিষয় কোড: ৮৮২৪/৫৮৮২৪'
+    };
+    const codeStr = codeMap[qbState.tradeId] ? ` (${codeMap[qbState.tradeId]})` : '';
+    if (subjEl) {
+      subjEl.textContent = `বিষয়: ${tradeMeta.title}${codeStr} • ${chLabel}`;
+    }
+
+    if (timeEl) timeEl.textContent = qbState.examTime;
+    if (marksEl) marksEl.textContent = toBnNum(totalCurrentMarks || qbState.targetMarks);
+
+    if (statQCount) statQCount.textContent = toBnNum(qbState.items.length);
+    if (statTargetMarks) statTargetMarks.textContent = toBnNum(qbState.targetMarks);
+    if (statCurrentMarks) statCurrentMarks.textContent = toBnNum(totalCurrentMarks);
+    if (mobilePaperCount) mobilePaperCount.textContent = toBnNum(qbState.items.length);
+
+    const dropzone = document.getElementById('qb-paper-dropzone');
+    if (!dropzone) return;
+
+    if (qbState.items.length === 0) {
+      dropzone.innerHTML = `
+        <div class="border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-2xl p-8 sm:p-10 text-center my-4">
+          <div class="w-12 h-12 rounded-2xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center mx-auto mb-3 text-xl">
+            <i class="fa-solid fa-arrows-up-down-left-right"></i>
+          </div>
+          <h4 class="text-base font-bold text-slate-800 dark:text-slate-200 mb-1">
+            প্রশ্নপত্র বর্তমানে খালি আছে
+          </h4>
+          <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 max-w-md mx-auto mb-4">
+            উপরের বার থেকে <strong>ট্রেড &gt; অধ্যায় &gt; প্রশ্নের ধরন &gt; পূর্ণমান</strong> নির্বাচন করে <strong>“প্রশ্ন তৈরি করুন”</strong> বাটনে ক্লিক করুন, অথবা বাম পাশের সাজেশন পুল থেকে যেকোনো প্রশ্ন টেনে (Drag &amp; Drop) এখানে ছেড়ে দিন।
+          </p>
+          <button
+            type="button"
+            id="qb-empty-generate-btn"
+            class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs sm:text-sm font-bold shadow-md"
+          >
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            <span>এখনই স্বয়ংক্রিয় প্রশ্নপত্র তৈরি করুন</span>
+          </button>
+        </div>
+      `;
+      const emptyGenBtn = document.getElementById('qb-empty-generate-btn');
+      if (emptyGenBtn) {
+        emptyGenBtn.addEventListener('click', () => autoGenerateExamPaper(false));
+      }
+      return;
+    }
+
+    dropzone.innerHTML = qbState.items.map((item, idx) => {
+      const isEditing = qbState.editingItemId === item.uid;
+      const boardTagHtml = (qbState.showBoardTags && item.board_years && item.board_years.length > 0)
+        ? `<span class="text-xs font-semibold text-emerald-600 dark:text-emerald-400 ml-1">[${formatBoardYearsText(item.board_years)}]</span>`
+        : '';
+
+      if (isEditing) {
+        return `
+          <div
+            data-paper-uid="${item.uid}"
+            data-paper-idx="${idx}"
+            class="qb-paper-item bg-indigo-50/60 dark:bg-slate-800 rounded-xl p-3.5 border-2 border-indigo-500 space-y-2.5"
+          >
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-xs font-extrabold text-indigo-600 dark:text-indigo-400">
+                প্রশ্ন ${toBnNum(idx + 1)} মডিফাই / এডিট করুন
+              </span>
+              <div class="flex items-center gap-1.5">
+                <label class="text-xs font-bold text-slate-600 dark:text-slate-300">মান:</label>
+                <input
+                  type="number"
+                  id="qb-edit-marks-${item.uid}"
+                  min="1"
+                  max="50"
+                  value="${item.marks}"
+                  class="w-16 px-2 py-1 rounded-lg bg-slate-900 text-white border border-slate-700 text-xs font-bold text-center"
+                />
+              </div>
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">মূল প্রশ্ন:</label>
+              <textarea
+                id="qb-edit-q-${item.uid}"
+                rows="2"
+                class="w-full p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-sm sm:text-base font-semibold text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500"
+              >${escapeHtml(item.question)}</textarea>
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">বিকল্প প্রশ্ন (‘অথবা’ - ঐচ্ছিক):</label>
+              <input
+                type="text"
+                id="qb-edit-alt-${item.uid}"
+                value="${escapeHtml(item.altQuestion || '')}"
+                placeholder="যদি ‘অথবা’ প্রশ্ন দিতে চান তবে এখানে লিখুন..."
+                class="w-full p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-xs sm:text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:border-indigo-500"
+              />
+            </div>
+            <div class="flex items-center justify-end gap-2 pt-1">
+              <button
+                type="button"
+                data-cancel-edit="${item.uid}"
+                class="qb-cancel-edit-btn px-3 py-1 rounded-lg bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold"
+              >
+                বাতিল
+              </button>
+              <button
+                type="button"
+                data-save-edit="${item.uid}"
+                class="qb-save-edit-btn px-3.5 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold"
+              >
+                <i class="fa-solid fa-check mr-1"></i>সংরক্ষণ করুন
+              </button>
+            </div>
+          </div>
+        `;
+      }
+
+      return `
+        <div
+          draggable="true"
+          data-paper-uid="${item.uid}"
+          data-paper-idx="${idx}"
+          class="qb-paper-item group relative bg-slate-50/80 dark:bg-slate-800/70 hover:bg-white dark:hover:bg-slate-800 rounded-xl p-3 sm:p-3.5 border border-slate-200/90 dark:border-slate-700/80 hover:border-indigo-400 dark:hover:border-indigo-500/70 transition-all"
+        >
+          <div class="flex items-start justify-between gap-3">
+            <!-- Left Drag Handle & Question Number + Text -->
+            <div class="flex items-start gap-2.5 min-w-0 flex-1">
+              <span
+                class="cursor-grab active:cursor-grabbing text-slate-400 hover:text-indigo-500 mt-1 shrink-0"
+                title="ড্র্যাগ করে প্রশ্নের ক্রম পরিবর্তন করুন"
+              >
+                <i class="fa-solid fa-grip-vertical text-sm"></i>
+              </span>
+              <div class="min-w-0 flex-1">
+                <div class="text-base sm:text-[18px] font-bold text-slate-900 dark:text-slate-100 leading-relaxed">
+                  <span class="text-indigo-600 dark:text-indigo-400 mr-1">${toBnNum(idx + 1)}।</span>
+                  <span data-edit-trigger="${item.uid}" class="qb-edit-item-btn cursor-pointer hover:underline decoration-dashed" title="ক্লিক করে প্রশ্নটি এডিট করুন">${escapeHtml(item.question)}</span>
+                  ${boardTagHtml}
+                </div>
+                ${
+                  item.altQuestion
+                    ? `<div class="mt-1.5 pl-3 border-l-2 border-indigo-400 dark:border-indigo-500 flex items-center justify-between gap-2 bg-indigo-500/5 py-1 px-2 rounded-r-lg">
+                        <div class="text-sm sm:text-base font-medium text-slate-700 dark:text-slate-200">
+                          <strong class="text-indigo-600 dark:text-indigo-400 mr-1">অথবা,</strong>
+                          <span>${escapeHtml(item.altQuestion)}</span>
+                        </div>
+                        <button
+                          type="button"
+                          data-remove-alt="${item.uid}"
+                          class="qb-remove-alt-btn text-xs text-slate-400 hover:text-rose-500 px-1"
+                          title="‘অথবা’ প্রশ্নটি সরান"
+                        >
+                          <i class="fa-solid fa-xmark"></i>
+                        </button>
+                      </div>`
+                    : ''
+                }
+                <!-- Drop-as-Alt target hint when dragging -->
+                <div
+                  data-drop-alt-idx="${idx}"
+                  class="qb-alt-dropzone hidden mt-2 py-1 px-2.5 rounded-lg border border-dashed border-purple-400 bg-purple-500/10 text-[11px] font-bold text-purple-400 text-center"
+                >
+                  + এই প্রশ্নের ‘অথবা’ (বিকল্প প্রশ্ন) হিসেবে যুক্ত করতে এখানে ছেড়ে দিন
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Marks Input & Action Controls -->
+            <div class="flex flex-col sm:flex-row items-end sm:items-center gap-2 shrink-0">
+              <!-- Quick Marks Badge / Input -->
+              <div class="flex items-center gap-1 bg-slate-200/80 dark:bg-slate-900 px-2 py-1 rounded-lg border border-slate-300 dark:border-slate-700" title="এই প্রশ্নের নম্বর পরিবর্তন করুন">
+                <span class="text-[11px] text-slate-500 dark:text-slate-400 font-semibold">মান:</span>
+                <input
+                  type="number"
+                  min="1"
+                  max="50"
+                  value="${item.marks}"
+                  data-mark-uid="${item.uid}"
+                  class="qb-inline-mark-input w-10 bg-transparent text-xs sm:text-sm font-extrabold text-center text-slate-900 dark:text-white focus:outline-none"
+                />
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="flex items-center gap-1">
+                <button
+                  type="button"
+                  data-edit-trigger="${item.uid}"
+                  class="qb-edit-item-btn w-7 h-7 rounded-lg bg-slate-200/70 dark:bg-slate-700/70 hover:bg-indigo-600 hover:text-white text-slate-600 dark:text-slate-300 flex items-center justify-center text-xs transition-colors"
+                  title="প্রশ্নটি মডিফাই / এডিট করুন"
+                >
+                  <i class="fa-solid fa-pen-to-square"></i>
+                </button>
+                <button
+                  type="button"
+                  data-swap-uid="${item.uid}"
+                  class="qb-swap-item-btn w-7 h-7 rounded-lg bg-slate-200/70 dark:bg-slate-700/70 hover:bg-amber-500 hover:text-white text-slate-600 dark:text-slate-300 flex items-center justify-center text-xs transition-colors"
+                  title="সাজেশন থেকে অন্য একটি বিকল্প প্রশ্ন দিয়ে এটি বদলান (Swap)"
+                >
+                  <i class="fa-solid fa-arrows-rotate"></i>
+                </button>
+                <button
+                  type="button"
+                  data-move-up="${idx}"
+                  class="qb-move-up-btn w-7 h-7 rounded-lg bg-slate-200/70 dark:bg-slate-700/70 hover:bg-slate-600 hover:text-white text-slate-600 dark:text-slate-300 flex items-center justify-center text-xs transition-colors ${idx === 0 ? 'opacity-30 pointer-events-none' : ''}"
+                  title="উপরে নিন"
+                >
+                  <i class="fa-solid fa-arrow-up"></i>
+                </button>
+                <button
+                  type="button"
+                  data-move-down="${idx}"
+                  class="qb-move-down-btn w-7 h-7 rounded-lg bg-slate-200/70 dark:bg-slate-700/70 hover:bg-slate-600 hover:text-white text-slate-600 dark:text-slate-300 flex items-center justify-center text-xs transition-colors ${idx === qbState.items.length - 1 ? 'opacity-30 pointer-events-none' : ''}"
+                  title="নিচে নামান"
+                >
+                  <i class="fa-solid fa-arrow-down"></i>
+                </button>
+                <button
+                  type="button"
+                  data-delete-uid="${item.uid}"
+                  class="qb-delete-item-btn w-7 h-7 rounded-lg bg-rose-500/10 hover:bg-rose-600 text-rose-500 hover:text-white flex items-center justify-center text-xs transition-colors"
+                  title="প্রশ্নটি মুছে ফেলুন"
+                >
+                  <i class="fa-solid fa-trash-can"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    bindQbPaperEvents(dropzone);
+  }
+
+  function bindQbPaperEvents(dropzone) {
+    // 1. Inline mark change
+    dropzone.querySelectorAll('.qb-inline-mark-input').forEach(inp => {
+      inp.addEventListener('change', (e) => {
+        const uid = inp.getAttribute('data-mark-uid');
+        const item = qbState.items.find(i => i.uid === uid);
+        if (item) {
+          item.marks = Math.max(1, parseInt(e.target.value, 10) || 1);
+          saveQbStateToStorage();
+          renderQbPaper();
+        }
+      });
+    });
+
+    // 2. Open inline edit
+    dropzone.querySelectorAll('.qb-edit-item-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        qbState.editingItemId = btn.getAttribute('data-edit-trigger');
+        renderQbPaper();
+      });
+    });
+
+    // 3. Cancel inline edit
+    dropzone.querySelectorAll('.qb-cancel-edit-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        qbState.editingItemId = null;
+        renderQbPaper();
+      });
+    });
+
+    // 4. Save inline edit
+    dropzone.querySelectorAll('.qb-save-edit-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const uid = btn.getAttribute('data-save-edit');
+        const item = qbState.items.find(i => i.uid === uid);
+        if (item) {
+          const qVal = document.getElementById(`qb-edit-q-${uid}`)?.value.trim();
+          const altVal = document.getElementById(`qb-edit-alt-${uid}`)?.value.trim();
+          const mVal = parseInt(document.getElementById(`qb-edit-marks-${uid}`)?.value, 10);
+          if (qVal) item.question = qVal;
+          item.altQuestion = altVal || '';
+          if (mVal > 0) item.marks = mVal;
+        }
+        qbState.editingItemId = null;
+        saveQbStateToStorage();
+        renderQbAll();
+        showToast('প্রশ্নটি সফলভাবে আপডেট করা হয়েছে!');
+      });
+    });
+
+    // 5. Remove `অথবা`
+    dropzone.querySelectorAll('.qb-remove-alt-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const uid = btn.getAttribute('data-remove-alt');
+        const item = qbState.items.find(i => i.uid === uid);
+        if (item) {
+          item.altQuestion = '';
+          saveQbStateToStorage();
+          renderQbPaper();
+        }
+      });
+    });
+
+    // 6. Swap with another suggested question
+    dropzone.querySelectorAll('.qb-swap-item-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const uid = btn.getAttribute('data-swap-uid');
+        const idx = qbState.items.findIndex(i => i.uid === uid);
+        if (idx === -1) return;
+        const currentItem = qbState.items[idx];
+        const usedIds = new Set(qbState.items.map(i => i.sourceId));
+        const pool = state.questions.filter(q =>
+          !usedIds.has(q.id) &&
+          (qbState.tradeId === 'all' || q.trade_id === currentItem.trade_id) &&
+          q.base_type === currentItem.base_type &&
+          (qbState.chapterKey === 'all' || `${q.trade_id}::${q.chapter}` === qbState.chapterKey || q.chapter === currentItem.chapter)
+        );
+        if (pool.length === 0) {
+          showToast('এই অধ্যায়ে একই ধরনের আর কোনো অব্যবহৃত প্রশ্ন নেই');
+          return;
+        }
+        const randomReplacement = pool[Math.floor(Math.random() * Math.min(pool.length, 6))];
+        const newItem = createPaperItemFromQuestion(randomReplacement, currentItem.marks);
+        qbState.items[idx] = newItem;
+        saveQbStateToStorage();
+        renderQbAll();
+        renderAll();
+        showToast(`প্রশ্ন ${toBnNum(idx + 1)} নতুন প্রশ্ন দিয়ে পরিবর্তন করা হয়েছে!`);
+      });
+    });
+
+    // 7. Move Up / Move Down / Delete
+    dropzone.querySelectorAll('.qb-move-up-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = parseInt(btn.getAttribute('data-move-up'), 10);
+        if (idx > 0) {
+          const temp = qbState.items[idx - 1];
+          qbState.items[idx - 1] = qbState.items[idx];
+          qbState.items[idx] = temp;
+          saveQbStateToStorage();
+          renderQbPaper();
+        }
+      });
+    });
+
+    dropzone.querySelectorAll('.qb-move-down-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = parseInt(btn.getAttribute('data-move-down'), 10);
+        if (idx < qbState.items.length - 1) {
+          const temp = qbState.items[idx + 1];
+          qbState.items[idx + 1] = qbState.items[idx];
+          qbState.items[idx] = temp;
+          saveQbStateToStorage();
+          renderQbPaper();
+        }
+      });
+    });
+
+    dropzone.querySelectorAll('.qb-delete-item-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const uid = btn.getAttribute('data-delete-uid');
+        qbState.items = qbState.items.filter(i => i.uid !== uid);
+        saveQbStateToStorage();
+        renderQbAll();
+        renderAll();
+      });
+    });
+
+    // 8. Drag & Drop Reordering + Pool Insertion on Paper Items
+    dropzone.querySelectorAll('.qb-paper-item').forEach(itemEl => {
+      itemEl.addEventListener('dragstart', (e) => {
+        const idx = parseInt(itemEl.getAttribute('data-paper-idx'), 10);
+        e.dataTransfer.setData('text/plain', JSON.stringify({ type: 'paper-reorder', fromIdx: idx }));
+        e.dataTransfer.effectAllowed = 'move';
+        itemEl.classList.add('qb-item-dragging');
+      });
+
+      itemEl.addEventListener('dragend', () => {
+        itemEl.classList.remove('qb-item-dragging');
+        dropzone.querySelectorAll('.qb-alt-dropzone').forEach(z => z.classList.add('hidden'));
+      });
+
+      itemEl.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        itemEl.classList.add('qb-drop-active');
+        const altZone = itemEl.querySelector('.qb-alt-dropzone');
+        if (altZone) altZone.classList.remove('hidden');
+      });
+
+      itemEl.addEventListener('dragleave', (e) => {
+        if (!itemEl.contains(e.relatedTarget)) {
+          itemEl.classList.remove('qb-drop-active');
+          const altZone = itemEl.querySelector('.qb-alt-dropzone');
+          if (altZone) altZone.classList.add('hidden');
+        }
+      });
+
+      itemEl.addEventListener('drop', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        itemEl.classList.remove('qb-drop-active');
+        const targetIdx = parseInt(itemEl.getAttribute('data-paper-idx'), 10);
+        const droppedOnAltZone = e.target.closest('.qb-alt-dropzone');
+
+        try {
+          const payload = JSON.parse(e.dataTransfer.getData('text/plain'));
+          if (payload.type === 'paper-reorder') {
+            const fromIdx = payload.fromIdx;
+            if (fromIdx !== targetIdx && fromIdx >= 0 && fromIdx < qbState.items.length) {
+              const [moved] = qbState.items.splice(fromIdx, 1);
+              qbState.items.splice(targetIdx, 0, moved);
+              saveQbStateToStorage();
+              renderQbPaper();
+            }
+          } else if (payload.type === 'pool-question') {
+            const q = state.questions.find(item => item.id === payload.qid);
+            if (!q) return;
+            if (droppedOnAltZone && qbState.items[targetIdx]) {
+              qbState.items[targetIdx].altQuestion = q.question;
+              showToast(`প্রশ্ন ${toBnNum(targetIdx + 1)}-এর ‘অথবা’ হিসেবে যুক্ত হয়েছে!`);
+            } else {
+              const newItem = createPaperItemFromQuestion(q);
+              qbState.items.splice(targetIdx + 1, 0, newItem);
+              showToast('প্রশ্নপত্রে প্রশ্নটি ড্রপ করা হয়েছে!');
+            }
+            saveQbStateToStorage();
+            renderQbAll();
+            renderAll();
+          }
+        } catch (err) {
+          console.error('Drop error:', err);
+        }
+      });
+    });
+  }
+
+  function renderQbAll() {
+    renderQbChapterOptions();
+    renderQbPool();
+    renderQbPaper();
+  }
+
+  // Format Exam Paper for Print / PDF and MS Word Copy
+  function buildPrintableExamPaperHtml() {
+    syncQbInputsToState();
+    const totalCurrentMarks = qbState.items.reduce((sum, item) => sum + (Number(item.marks) || 0), 0);
+    const tradeMeta = TRADES_META[qbState.tradeId] || TRADES_META['trade-3'];
+    const chLabel = qbState.chapterKey === 'all'
+      ? ''
+      : ` • ${qbState.chapterKey.includes('::') ? qbState.chapterKey.split('::')[1] : qbState.chapterKey}`;
+    const codeMap = {
+      'trade-1': 'বিষয় কোড: ৮৮২১/৫৮৮২১',
+      'trade-2': 'বিষয় কোড: ৮৮২২/৫৮৮২২',
+      'trade-3': 'বিষয় কোড: ৮৮২৩/৫৮৮২৩',
+      'trade-4': 'বিষয় কোড: ৮৮২৪/৫৮৮২৪'
+    };
+
+    return `
+      <div class="text-black bg-white">
+        <div class="text-center border-b-2 border-black pb-3 mb-4">
+          <h1 class="text-2xl font-bold">${escapeHtml(qbState.institution)}</h1>
+          <h2 class="text-lg font-bold mt-0.5">${escapeHtml(qbState.examName)}</h2>
+          <p class="text-base font-semibold mt-0.5">বিষয়: ${escapeHtml(tradeMeta.title)}${escapeHtml(chLabel)}</p>
+          ${codeMap[qbState.tradeId] ? `<p class="text-sm font-semibold">${codeMap[qbState.tradeId]}</p>` : ''}
+          <div class="flex items-center justify-between mt-2 pt-1 text-sm font-bold">
+            <span>সময়: ${escapeHtml(qbState.examTime)}</span>
+            <span>পূর্ণমান: ${toBnNum(totalCurrentMarks || qbState.targetMarks)}</span>
+          </div>
+          ${qbState.instruction ? `<p class="text-xs italic mt-1">${escapeHtml(qbState.instruction)}</p>` : ''}
+        </div>
+
+        <div class="space-y-3">
+          ${qbState.items.map((item, idx) => {
+            const bTag = (qbState.showBoardTags && item.board_years && item.board_years.length > 0)
+              ? ` <span class="text-xs font-normal">[${formatBoardYearsText(item.board_years)}]</span>`
+              : '';
+            return `
+              <div class="flex items-start justify-between gap-4 py-1" style="break-inside: avoid;">
+                <div class="flex-1 text-base leading-relaxed">
+                  <div>
+                    <strong>${toBnNum(idx + 1)}।</strong> ${escapeHtml(item.question)}${bTag}
+                  </div>
+                  ${
+                    item.altQuestion
+                      ? `<div class="pl-5 mt-0.5 text-base">
+                          <strong>অথবা,</strong> ${escapeHtml(item.altQuestion)}
+                        </div>`
+                      : ''
+                  }
+                </div>
+                <div class="shrink-0 font-bold text-base pl-2">
+                  ${toBnNum(item.marks)}
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  function formatExamPaperAsText() {
+    syncQbInputsToState();
+    const totalCurrentMarks = qbState.items.reduce((sum, item) => sum + (Number(item.marks) || 0), 0);
+    const tradeMeta = TRADES_META[qbState.tradeId] || TRADES_META['trade-3'];
+    const chLabel = qbState.chapterKey === 'all'
+      ? ''
+      : ` (${qbState.chapterKey.includes('::') ? qbState.chapterKey.split('::')[1] : qbState.chapterKey})`;
+
+    const lines = [
+      qbState.institution,
+      qbState.examName,
+      `বিষয়: ${tradeMeta.title}${chLabel}`,
+      `সময়: ${qbState.examTime} \t\t পূর্ণমান: ${toBnNum(totalCurrentMarks || qbState.targetMarks)}`,
+      qbState.instruction,
+      '------------------------------------------------------------',
+      ''
+    ];
+
+    qbState.items.forEach((item, idx) => {
+      const bTag = (qbState.showBoardTags && item.board_years && item.board_years.length > 0)
+        ? ` [${formatBoardYearsText(item.board_years)}]`
+        : '';
+      lines.push(`${toBnNum(idx + 1)}। ${item.question}${bTag} \t\t (${toBnNum(item.marks)})`);
+      if (item.altQuestion) {
+        lines.push(`   অথবা, ${item.altQuestion}`);
+      }
+    });
+
+    return lines.join('\n');
+  }
+
+  function switchQbMobileTab(tabName) {
+    qbState.mobileTab = tabName;
+    const poolPane = document.getElementById('qb-left-pool-pane');
+    const paperPane = document.getElementById('qb-right-paper-pane');
+    document.querySelectorAll('.qb-mobile-tab').forEach(btn => {
+      const t = btn.getAttribute('data-qb-tab');
+      const active = t === tabName;
+      btn.className = `qb-mobile-tab flex-1 py-2.5 text-xs font-bold border-b-2 ${
+        active
+          ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400'
+          : 'border-transparent text-slate-500 dark:text-slate-400'
+      }`;
+    });
+    if (poolPane && paperPane) {
+      if (tabName === 'pool') {
+        poolPane.classList.remove('hidden');
+        poolPane.classList.add('flex');
+        paperPane.classList.add('hidden');
+        paperPane.classList.remove('flex');
+      } else {
+        paperPane.classList.remove('hidden');
+        paperPane.classList.add('flex');
+        poolPane.classList.add('hidden');
+        poolPane.classList.remove('flex');
+      }
+    }
+  }
+
+  function initQuestionBuilder() {
+    loadQbStateFromStorage();
+
+    const openBtn = document.getElementById('open-question-builder-btn');
+    if (openBtn) {
+      openBtn.addEventListener('click', () => {
+        // Sync initial trade/chapter from main app if user had one active
+        if (state.activeTrade !== 'all') {
+          qbState.tradeId = state.activeTrade;
+          const trEl = document.getElementById('qb-trade-select');
+          if (trEl) trEl.value = qbState.tradeId;
+        }
+        renderQbChapterOptions();
+        if (state.activeChapter !== 'all') {
+          qbState.chapterKey = state.activeChapter;
+          const chEl = document.getElementById('qb-chapter-select');
+          if (chEl) chEl.value = qbState.chapterKey;
+        }
+        if (state.activeType !== 'all') {
+          qbState.qType = state.activeType;
+          const tpEl = document.getElementById('qb-type-select');
+          if (tpEl) tpEl.value = qbState.qType;
+        }
+
+        // If paper is empty on first open, auto-generate a default 10-mark paper so user immediately sees it in action!
+        if (qbState.items.length === 0) {
+          autoGenerateExamPaper(false);
+        } else {
+          renderQbAll();
+        }
+        openModal('question-builder-modal');
+      });
+    }
+
+    // Trade / Chapter / Type change events
+    const tradeSelect = document.getElementById('qb-trade-select');
+    if (tradeSelect) {
+      tradeSelect.addEventListener('change', (e) => {
+        qbState.tradeId = e.target.value;
+        qbState.chapterKey = 'all';
+        renderQbAll();
+      });
+    }
+
+    const chSelect = document.getElementById('qb-chapter-select');
+    if (chSelect) {
+      chSelect.addEventListener('change', (e) => {
+        qbState.chapterKey = e.target.value;
+        renderQbPool();
+        renderQbPaper();
+      });
+    }
+
+    const typeSelect = document.getElementById('qb-type-select');
+    if (typeSelect) {
+      typeSelect.addEventListener('change', (e) => {
+        qbState.qType = e.target.value;
+        renderQbPool();
+      });
+    }
+
+    // Live Header Inputs
+    ['qb-total-marks-input', 'qb-exam-name-input', 'qb-exam-time-input', 'qb-institution-input', 'qb-instruction-input'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.addEventListener('input', () => {
+          syncQbInputsToState();
+          saveQbStateToStorage();
+          renderQbPaper();
+        });
+      }
+    });
+
+    const showBoardCheckbox = document.getElementById('qb-show-board-tags');
+    if (showBoardCheckbox) {
+      showBoardCheckbox.checked = qbState.showBoardTags;
+      showBoardCheckbox.addEventListener('change', () => {
+        qbState.showBoardTags = showBoardCheckbox.checked;
+        saveQbStateToStorage();
+        renderQbPaper();
+      });
+    }
+
+    // Generate & Append buttons
+    const genBtn = document.getElementById('qb-generate-btn');
+    if (genBtn) {
+      genBtn.addEventListener('click', () => autoGenerateExamPaper(false));
+    }
+
+    const appendBtn = document.getElementById('qb-append-btn');
+    if (appendBtn) {
+      appendBtn.addEventListener('click', () => autoGenerateExamPaper(true));
+    }
+
+    // Pool Search & Priority Filter
+    const poolSearch = document.getElementById('qb-pool-search');
+    if (poolSearch) {
+      poolSearch.addEventListener('input', (e) => {
+        qbState.poolSearch = e.target.value;
+        renderQbPool();
+      });
+    }
+
+    const poolPriority = document.getElementById('qb-pool-filter-priority');
+    if (poolPriority) {
+      poolPriority.addEventListener('change', (e) => {
+        qbState.poolPriority = e.target.value;
+        renderQbPool();
+      });
+    }
+
+    // Mobile Tabs inside Studio
+    document.querySelectorAll('.qb-mobile-tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        switchQbMobileTab(btn.getAttribute('data-qb-tab'));
+      });
+    });
+
+    // Add Custom Blank Question button
+    const addCustomBtn = document.getElementById('qb-add-custom-q-btn');
+    if (addCustomBtn) {
+      addCustomBtn.addEventListener('click', () => {
+        const defaultMark = getDefaultMarkForType(qbState.qType === 'all' || qbState.qType === 'mixed_board' ? 'short' : qbState.qType);
+        const newItem = {
+          uid: `pitem-${Date.now()}`,
+          sourceId: null,
+          question: 'নতুন প্রশ্ন এখানে লিখুন...',
+          altQuestion: '',
+          marks: defaultMark,
+          base_type: 'short',
+          board_years: [],
+          chapter: '',
+          trade_id: qbState.tradeId
+        };
+        qbState.items.push(newItem);
+        qbState.editingItemId = newItem.uid;
+        saveQbStateToStorage();
+        renderQbPaper();
+      });
+    }
+
+    // Shuffle Paper Questions
+    const shuffleBtn = document.getElementById('qb-shuffle-paper-btn');
+    if (shuffleBtn) {
+      shuffleBtn.addEventListener('click', () => {
+        for (let i = qbState.items.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [qbState.items[i], qbState.items[j]] = [qbState.items[j], qbState.items[i]];
+        }
+        saveQbStateToStorage();
+        renderQbPaper();
+        showToast('প্রশ্নপত্রের ক্রম শাফল (এলোমেলো) করা হয়েছে');
+      });
+    }
+
+    // Clear Paper
+    const clearBtn = document.getElementById('qb-clear-paper-btn');
+    if (clearBtn) {
+      clearBtn.addEventListener('click', () => {
+        qbState.items = [];
+        qbState.editingItemId = null;
+        saveQbStateToStorage();
+        renderQbAll();
+        renderAll();
+        showToast('প্রশ্নপত্র খালি করা হয়েছে');
+      });
+    }
+
+    // Dropzone container dragover/drop for dropping into empty space or end of paper
+    const dropzone = document.getElementById('qb-paper-dropzone');
+    if (dropzone) {
+      dropzone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropzone.classList.add('qb-drop-active');
+      });
+      dropzone.addEventListener('dragleave', (e) => {
+        if (!dropzone.contains(e.relatedTarget)) {
+          dropzone.classList.remove('qb-drop-active');
+        }
+      });
+      dropzone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropzone.classList.remove('qb-drop-active');
+        try {
+          const payload = JSON.parse(e.dataTransfer.getData('text/plain'));
+          if (payload.type === 'pool-question') {
+            const q = state.questions.find(item => item.id === payload.qid);
+            if (!q) return;
+            qbState.items.push(createPaperItemFromQuestion(q));
+            saveQbStateToStorage();
+            renderQbAll();
+            renderAll();
+            showToast('প্রশ্নপত্রে প্রশ্নটি যুক্ত হয়েছে!');
+          }
+        } catch (err) {}
+      });
+    }
+
+    // Copy Formatted Exam Paper for MS Word
+    const copyPaperBtn = document.getElementById('qb-copy-paper-btn');
+    if (copyPaperBtn) {
+      copyPaperBtn.addEventListener('click', () => {
+        if (qbState.items.length === 0) {
+          showToast('কপি করার জন্য অন্তত একটি প্রশ্ন যুক্ত করুন');
+          return;
+        }
+        const txt = formatExamPaperAsText();
+        navigator.clipboard.writeText(txt).then(() => {
+          showToast('পূর্ণাঙ্গ প্রশ্নপত্রটি ক্লিপবোর্ডে কপি করা হয়েছে (MS Word-এ পেস্ট করার উপযোগী)!');
+        });
+      });
+    }
+
+    // Print / PDF Exam Paper
+    const printPaperBtn = document.getElementById('qb-print-paper-btn');
+    if (printPaperBtn) {
+      printPaperBtn.addEventListener('click', () => {
+        if (qbState.items.length === 0) {
+          showToast('প্রিন্ট করার জন্য অন্তত একটি প্রশ্ন যুক্ত করুন');
+          return;
+        }
+        const sheetEl = document.getElementById('exam-paper-print-sheet');
+        if (sheetEl) {
+          sheetEl.innerHTML = buildPrintableExamPaperHtml();
+        }
+        document.body.classList.add('printing-exam-paper');
+        window.print();
+        setTimeout(() => {
+          document.body.classList.remove('printing-exam-paper');
+        }, 500);
+      });
+    }
   }
 
   // PWA Service Worker & Long-Duration Launch Install Toast
