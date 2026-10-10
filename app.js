@@ -100,14 +100,24 @@
     }
   };
 
+  function getShortTradeBadge(tid, fallback) {
+    if (tid === 'trade-1') return 'ট্রেড-১';
+    if (tid === 'trade-2') return 'ট্রেড-২';
+    if (tid === 'trade-3') return 'ট্রেড-৩';
+    if (tid === 'trade-4') return 'ট্রেড-৪';
+    return fallback || tid;
+  }
+
   // Topic Quick Filter definitions
   const TOPIC_FILTERS = [
     { id: 'all', label: 'সকল টপিক', icon: 'fa-border-all', keywords: [] },
-    { id: 'পূর্ণরূপ', label: 'পূর্ণরূপ (Full Form)', icon: 'fa-spell-check', keywords: ['পূর্ণরূপ', 'পূর্ণনাম'] },
+    { id: 'পূর্ণরূপ', label: 'পূর্ণরূপ (Full Form)', icon: 'fa-spell-check', keywords: ['পূর্ণরূপ', 'পূর্ণনাম', 'পূর্ণ নাম'] },
     { id: 'পার্থক্য', label: 'পার্থক্য (Difference)', icon: 'fa-scale-balanced', keywords: ['পার্থক্য'] },
-    { id: 'চিত্র/ডায়াগ্রাম', label: 'চিত্র ও ফ্লোচার্ট', icon: 'fa-diagram-project', keywords: ['চিত্র', 'অঙ্কন', 'ডায়াগ্রাম', 'ফ্লোচার্ট'] },
+    { id: 'চিত্র/ডায়াগ্রাম', label: 'চিত্র ও ফ্লোচার্ট', icon: 'fa-diagram-project', keywords: ['চিত্র', 'অঙ্কন', 'ডায়াগ্রাম', 'ফ্লোচার্ট', 'প্রতীক আঁক'] },
     { id: 'কোডিং/অ্যালগরিদম', label: 'প্রোগ্রাম ও অ্যালগরিদম', icon: 'fa-code', keywords: ['প্রোগ্রাম লেখ', 'প্রোগ্রামটি কর', 'ফাংশন লেখ', 'অ্যালগরিদম'] },
-    { id: 'মাদারবোর্ড ও পোর্ট', label: 'মাদারবোর্ড ও পোর্ট', icon: 'fa-plug', keywords: ['মাদারবোর্ড', 'motherboard', 'পোর্ট', 'port', 'স্লট', 'র‍্যাম', 'ram'] },
+    { id: 'ইলেকট্রিক্যাল ও ইলেকট্রনিক্স', label: 'ইলেকট্রিক্যাল ও ইলেকট্রনিক্স', icon: 'fa-bolt-lightning', keywords: ['ইলেকট্রিসিটি', 'কারেন্ট', 'ভোল্টেজ', 'রেজিস্ট্যান্স', 'রেজিস্টর', 'ক্যাপাসিটর', 'ইন্ডাক্টর', 'ডায়োড', 'মাল্টিমিটার', 'ট্রান্সফর্মার', 'ফিউজ', 'পাওয়ার ফ্যাক্টর', 'ওহম'] },
+    { id: 'ইথিকস ও হ্যাজার্ড', label: 'ইথিকস, পিপিই ও হ্যাজার্ড', icon: 'fa-helmet-safety', keywords: ['ইথিকস', 'হ্যাজার্ড', 'পিপিই', 'ppe', 'ঝুঁকি', 'কপিরাইট', 'প্লেজারিজম', 'মেধাস্বত্ব', 'ওএসএইচ'] },
+    { id: 'মাদারবোর্ড ও হার্ডওয়্যার', label: 'মাদারবোর্ড, পোর্ট ও হার্ডওয়্যার', icon: 'fa-plug', keywords: ['মাদারবোর্ড', 'motherboard', 'পোর্ট', 'port', 'স্লট', 'র‍্যাম', 'ram', 'সিপিইউ', 'cpu', 'চিপসেট', 'প্রসেসর'] },
     { id: 'সিকিউরিটি ও ম্যালওয়্যার', label: 'সিকিউরিটি ও ভাইরাস', icon: 'fa-shield-halved', keywords: ['সিকিউরিটি', 'নিরাপত্তা', 'ভাইরাস', 'ম্যালওয়্যার', 'ট্রোজান', 'পাসওয়ার্ড', 'সাইবার', 'ফিশিং'] },
     { id: 'ল্যাপটপ সার্ভিসিং', label: 'ল্যাপটপ সার্ভিসিং', icon: 'fa-laptop', keywords: ['ল্যাপটপ', 'থার্মাল', 'ব্যাটারি', 'টাচপ্যাড', 'কুলিং'] },
     { id: 'পাইথন ও প্রোগ্রামিং', label: 'পাইথন ও প্রোগ্রামিং', icon: 'fa-terminal', keywords: ['পাইথন', 'python', 'লিস্ট', 'টাপল', 'ডাটা টাইপ', 'অপারেটর', 'লুপ', 'কম্পাইলার'] },
@@ -373,6 +383,9 @@
       // Default serial fallback
       if (a.trade_id !== b.trade_id) return a.trade_id.localeCompare(b.trade_id);
       if (a.chapter_num !== b.chapter_num) return a.chapter_num - b.chapter_num;
+      if (a.trade_id === 'trade-1') {
+        return a.q_no - b.q_no;
+      }
       const ordA = TYPE_META[a.base_type]?.order || 99;
       const ordB = TYPE_META[b.base_type]?.order || 99;
       if (ordA !== ordB) return ordA - ordB;
@@ -686,7 +699,7 @@
     if (mobileChapterSelect) {
       let opts = `<option value="all">সকল অধ্যায় (${toBnNum(baseQuestions.length)}টি প্রশ্ন)</option>`;
       chaptersList.forEach(ch => {
-        const prefix = state.activeTrade === 'all' ? `[${ch.trade_id === 'trade-3' ? 'ট্রেড-৩' : ch.trade_id === 'trade-4' ? 'ট্রেড-৪' : ch.trade_name}] ` : '';
+        const prefix = state.activeTrade === 'all' ? `[${getShortTradeBadge(ch.trade_id, ch.trade_name)}] ` : '';
         opts += `<option value="${escapeHtml(ch.key)}" ${state.activeChapter === ch.key ? 'selected' : ''}>${escapeHtml(prefix + ch.chapter)} (${toBnNum(ch.matching)})</option>`;
       });
       mobileChapterSelect.innerHTML = opts;
@@ -960,7 +973,7 @@
             <!-- Trade & Chapter Badge -->
             <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-slate-100 dark:bg-slate-700/80 text-slate-600 dark:text-slate-300">
               <i class="fa-solid fa-book-bookmark text-indigo-500 text-[10px]"></i>
-              <span>${q.trade_id === 'trade-3' ? 'ট্রেড-৩' : q.trade_id === 'trade-4' ? 'ট্রেড-৪' : escapeHtml(q.trade_name)} • ${escapeHtml(q.chapter.split(':')[0])}</span>
+              <span>${escapeHtml(getShortTradeBadge(q.trade_id, q.trade_name))} • ${escapeHtml(q.chapter.split(':')[0])}</span>
             </span>
             <!-- Section / Type Badge -->
             <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold border ${typeMeta.badgeClass}">
@@ -1100,7 +1113,7 @@
               id="switch-to-trade-3-btn"
               class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 transition-all"
             >
-              <span>ট্রেড-৩ ও ট্রেড-৪ দেখুন (৫৫৬টি প্রশ্ন)</span>
+              <span>সকল ট্রেড দেখুন (৭২৭টি প্রশ্ন)</span>
               <i class="fa-solid fa-arrow-right"></i>
             </button>
           </div>
@@ -1214,7 +1227,7 @@
             >
               <div class="flex items-center gap-3">
                 <span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-indigo-600 text-white shadow-2xs">
-                  ${grp.trade_id === 'trade-3' ? 'ট্রেড-৩' : grp.trade_id === 'trade-4' ? 'ট্রেড-৪' : escapeHtml(grp.trade_name)}
+                  ${escapeHtml(getShortTradeBadge(grp.trade_id, grp.trade_name))}
                 </span>
                 <div>
                   <h3 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white leading-snug">
@@ -1376,7 +1389,7 @@
       if (!chMap.has(k)) {
         const item = {
           key: k,
-          trade_name: q.trade_id === 'trade-3' ? 'ট্রেড-৩' : q.trade_id === 'trade-4' ? 'ট্রেড-৪' : q.trade_name,
+          trade_name: getShortTradeBadge(q.trade_id, q.trade_name),
           chapter: q.chapter,
           total: 0,
           board: 0,
