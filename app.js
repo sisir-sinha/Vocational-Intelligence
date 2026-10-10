@@ -299,7 +299,7 @@
         } else if (state.activePreset === 'board_all') {
           if (!q.board_years || q.board_years.length === 0) return false;
         } else if (state.activePreset === 'board_recent') {
-          if (!q.board_years || (!q.board_years.includes(2025) && !q.board_years.includes(2024))) return false;
+          if (!q.board_years || (!q.board_years.includes(2026) && !q.board_years.includes(2025) && !q.board_years.includes(2024))) return false;
         } else if (state.activePreset === 'starred') {
           if (!isStarred) return false;
         }
@@ -487,7 +487,7 @@
       top_important: basePool.filter(q => q.importance_tier === 'top' || state.starredIds.has(q.id)).length,
       all_important: basePool.filter(q => q.importance_tier !== 'standard' || state.starredIds.has(q.id)).length,
       board_all: basePool.filter(q => q.board_years && q.board_years.length > 0).length,
-      board_recent: basePool.filter(q => q.board_years && (q.board_years.includes(2025) || q.board_years.includes(2024))).length,
+      board_recent: basePool.filter(q => q.board_years && (q.board_years.includes(2026) || q.board_years.includes(2025) || q.board_years.includes(2024))).length,
       starred: basePool.filter(q => state.starredIds.has(q.id)).length
     };
 
@@ -496,7 +496,7 @@
       { id: 'top_important', label: 'অতি গুরুত্বপূর্ণ (★★★)', icon: 'fa-fire', count: counts.top_important, color: 'rose' },
       { id: 'all_important', label: 'গুরুত্বপূর্ণ সাজেশন', icon: 'fa-wand-magic-sparkles', count: counts.all_important, color: 'amber' },
       { id: 'board_all', label: 'সকল বোর্ড প্রশ্ন [বাকাশিবো]', icon: 'fa-building-columns', count: counts.board_all, color: 'emerald' },
-      { id: 'board_recent', label: 'বোর্ড ২০২৪ ও ২০২৫', icon: 'fa-calendar-check', count: counts.board_recent, color: 'cyan' },
+      { id: 'board_recent', label: 'বোর্ড ২০২৪–২০২৬', icon: 'fa-calendar-check', count: counts.board_recent, color: 'cyan' },
       { id: 'starred', label: 'আমার তারকাচিহ্নিত (★)', icon: 'fa-star', count: counts.starred, color: 'yellow' }
     ];
 
@@ -762,7 +762,7 @@
         top_important: 'অতি গুরুত্বপূর্ণ (★★★)',
         all_important: 'গুরুত্বপূর্ণ সাজেশন',
         board_all: 'সকল বোর্ড প্রশ্ন',
-        board_recent: 'বোর্ড ২০২৪ ও ২০২৫',
+        board_recent: 'বোর্ড ২০২৪–২০২৬',
         starred: 'আমার তারকাচিহ্নিত'
       };
       chips.push({ label: map[state.activePreset] || state.activePreset, clear: () => { state.activePreset = 'all'; } });
@@ -1414,7 +1414,7 @@
         <div class="bg-slate-50 dark:bg-slate-800/60 rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-700">
           <h4 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white mb-1 flex items-center gap-2">
             <i class="fa-solid fa-chart-column text-emerald-600"></i>
-            <span>সালভিত্তিক বাকাশিবো বোর্ড প্রশ্ন (২০১১–২০২৫)</span>
+            <span>সালভিত্তিক বাকাশিবো বোর্ড প্রশ্ন (২০০৯–২০২৬)</span>
           </h4>
           <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">যেকোনো সালে ক্লিক করলে ওই সালের সকল বোর্ড প্রশ্ন ফিল্টার হয়ে যাবে।</p>
           <div class="space-y-2.5 max-h-80 overflow-y-auto pr-1">
