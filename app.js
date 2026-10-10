@@ -168,10 +168,51 @@
         state.darkMode = true;
         document.documentElement.classList.add('dark');
       }
+
+      // Restore active filters, search, sort & view mode from localStorage
+      const savedFiltersRaw = localStorage.getItem('vi_active_filters_v1');
+      if (savedFiltersRaw) {
+        const sf = JSON.parse(savedFiltersRaw);
+        if (sf && typeof sf === 'object') {
+          if (typeof sf.activeTrade === 'string' && TRADES_META[sf.activeTrade]) state.activeTrade = sf.activeTrade;
+          if (typeof sf.activeChapter === 'string') state.activeChapter = sf.activeChapter;
+          if (typeof sf.activePreset === 'string') state.activePreset = sf.activePreset;
+          if (typeof sf.activeType === 'string') state.activeType = sf.activeType;
+          if (typeof sf.activeSource === 'string') state.activeSource = sf.activeSource;
+          if (sf.activeBoardYear !== undefined && sf.activeBoardYear !== null) state.activeBoardYear = String(sf.activeBoardYear);
+          if (typeof sf.activeTopic === 'string') state.activeTopic = sf.activeTopic;
+          if (typeof sf.searchQuery === 'string') state.searchQuery = sf.searchQuery;
+          if (typeof sf.searchScope === 'string') state.searchScope = sf.searchScope;
+          if (typeof sf.sortBy === 'string') state.sortBy = sf.sortBy;
+          if (typeof sf.viewMode === 'string') state.viewMode = sf.viewMode;
+          if (Array.isArray(sf.collapsedGroups)) state.collapsedGroups = new Set(sf.collapsedGroups);
+        }
+      }
     } catch (err) {
       console.error('Storage load error:', err);
       state.questions = [...(window.INITIAL_QUESTIONS_DATA || [])];
       document.documentElement.classList.add('dark');
+    }
+  }
+
+  function saveFiltersToStorage() {
+    try {
+      localStorage.setItem('vi_active_filters_v1', JSON.stringify({
+        activeTrade: state.activeTrade,
+        activeChapter: state.activeChapter,
+        activePreset: state.activePreset,
+        activeType: state.activeType,
+        activeSource: state.activeSource,
+        activeBoardYear: state.activeBoardYear,
+        activeTopic: state.activeTopic,
+        searchQuery: state.searchQuery,
+        searchScope: state.searchScope,
+        sortBy: state.sortBy,
+        viewMode: state.viewMode,
+        collapsedGroups: Array.from(state.collapsedGroups)
+      }));
+    } catch (e) {
+      console.error('Filter save error:', e);
     }
   }
 
@@ -1676,11 +1717,13 @@
 
   // Main render orchestrator
   function renderAll() {
+    saveFiltersToStorage();
     renderHeaderAndTrades();
     renderPresetBar();
     renderTopicChips();
     renderChapterNavigation();
     renderBoardYearDropdown();
+    syncControlInputs();
     const filtered = getFilteredQuestions();
     renderActiveFilterChips(filtered);
     renderQuestionsFeed(filtered);
@@ -2010,20 +2053,27 @@
         const parsed = JSON.parse(saved);
         if (parsed && typeof parsed === 'object') {
           if (Array.isArray(parsed.items)) qbState.items = parsed.items;
-          if (parsed.tradeId) qbState.tradeId = parsed.tradeId;
-          if (parsed.qType) qbState.qType = parsed.qType;
-          if (parsed.institution) qbState.institution = parsed.institution;
-          if (parsed.examName) qbState.examName = parsed.examName;
-          if (parsed.subjectLine) qbState.subjectLine = parsed.subjectLine;
-          if (parsed.examTime) qbState.examTime = parsed.examTime;
-          if (parsed.targetMarks) qbState.targetMarks = parsed.targetMarks;
-          if (parsed.instruction) qbState.instruction = parsed.instruction;
+          if (typeof parsed.tradeId === 'string') qbState.tradeId = parsed.tradeId;
+          if (typeof parsed.chapterKey === 'string') qbState.chapterKey = parsed.chapterKey;
+          if (typeof parsed.qType === 'string') qbState.qType = parsed.qType;
+          if (typeof parsed.institution === 'string') qbState.institution = parsed.institution;
+          if (typeof parsed.examName === 'string') qbState.examName = parsed.examName;
+          if (typeof parsed.subjectLine === 'string') qbState.subjectLine = parsed.subjectLine;
+          if (typeof parsed.customSubjectEdited === 'boolean') qbState.customSubjectEdited = parsed.customSubjectEdited;
+          if (typeof parsed.examTime === 'string') qbState.examTime = parsed.examTime;
+          if (parsed.targetMarks) qbState.targetMarks = Number(parsed.targetMarks) || 60;
+          if (typeof parsed.instruction === 'string') qbState.instruction = parsed.instruction;
           if (typeof parsed.showBoardTags === 'boolean') qbState.showBoardTags = parsed.showBoardTags;
+          if (typeof parsed.poolSearch === 'string') qbState.poolSearch = parsed.poolSearch;
+          if (typeof parsed.poolPriority === 'string') qbState.poolPriority = parsed.poolPriority;
+          if (parsed.mobileTab === 'pool' || parsed.mobileTab === 'paper') qbState.mobileTab = parsed.mobileTab;
         }
       }
     } catch (e) {
       console.error('QB load error:', e);
     }
+    renderQbChapterOptions();
+    syncStateToQbHeaderInputs();
     updateHeaderBuilderBadge();
   }
 
@@ -2032,14 +2082,19 @@
       localStorage.setItem('vi_qb_state_v2', JSON.stringify({
         items: qbState.items,
         tradeId: qbState.tradeId,
+        chapterKey: qbState.chapterKey,
         qType: qbState.qType,
         institution: qbState.institution,
         examName: qbState.examName,
         subjectLine: qbState.subjectLine,
+        customSubjectEdited: qbState.customSubjectEdited,
         examTime: qbState.examTime,
         targetMarks: qbState.targetMarks,
         instruction: qbState.instruction,
-        showBoardTags: qbState.showBoardTags
+        showBoardTags: qbState.showBoardTags,
+        poolSearch: qbState.poolSearch,
+        poolPriority: qbState.poolPriority,
+        mobileTab: qbState.mobileTab
       }));
     } catch (e) {}
     updateHeaderBuilderBadge();
@@ -2293,8 +2348,12 @@
     const timeEl = document.getElementById('qb-exam-time-input');
     const instrEl = document.getElementById('qb-instruction-input');
     const trEl = document.getElementById('qb-trade-select');
+    const chEl = document.getElementById('qb-chapter-select');
     const tpEl = document.getElementById('qb-type-select');
     const mkEl = document.getElementById('qb-total-marks-input');
+    const showBoardEl = document.getElementById('qb-show-board-tags');
+    const poolSearchEl = document.getElementById('qb-pool-search');
+    const poolPriorityEl = document.getElementById('qb-pool-filter-priority');
 
     if (instNameEl && document.activeElement !== instNameEl) instNameEl.value = qbState.institution;
     if (examNameEl && document.activeElement !== examNameEl) examNameEl.value = qbState.examName;
@@ -2302,8 +2361,12 @@
     if (timeEl && document.activeElement !== timeEl) timeEl.value = qbState.examTime;
     if (instrEl && document.activeElement !== instrEl) instrEl.value = qbState.instruction;
     if (trEl && document.activeElement !== trEl) trEl.value = qbState.tradeId;
+    if (chEl && document.activeElement !== chEl) chEl.value = qbState.chapterKey;
     if (tpEl && document.activeElement !== tpEl) tpEl.value = qbState.qType;
     if (mkEl && document.activeElement !== mkEl) mkEl.value = qbState.targetMarks;
+    if (showBoardEl) showBoardEl.checked = Boolean(qbState.showBoardTags);
+    if (poolSearchEl && document.activeElement !== poolSearchEl) poolSearchEl.value = qbState.poolSearch || '';
+    if (poolPriorityEl && document.activeElement !== poolPriorityEl) poolPriorityEl.value = qbState.poolPriority || 'all';
   }
 
   // Render Left Pane: Suggested Question Pool (Simple Click / Double-Click on Alternate, Zero Drag Hang)
@@ -2506,7 +2569,7 @@
 
   // Render Right Pane: Live Exam Question Paper Preview & Editor
   function renderQbPaper() {
-    syncQbInputsToState();
+    syncStateToQbHeaderInputs();
 
     const marksEl = document.getElementById('qb-paper-marks-display');
     const statQCount = document.getElementById('qb-stat-qcount');
@@ -2521,8 +2584,6 @@
     if (statTargetMarks) statTargetMarks.textContent = toBnNum(qbState.targetMarks);
     if (statCurrentMarks) statCurrentMarks.textContent = toBnNum(totalCurrentMarks);
     if (mobilePaperCount) mobilePaperCount.textContent = toBnNum(qbState.items.length);
-
-    syncStateToQbHeaderInputs();
 
     const dropzone = document.getElementById('qb-paper-dropzone');
     if (!dropzone) return;
@@ -2996,12 +3057,13 @@
   }
 
   function switchQbMobileTab(tabName) {
-    qbState.mobileTab = tabName;
+    qbState.mobileTab = tabName === 'pool' ? 'pool' : 'paper';
+    saveQbStateToStorage();
     const poolPane = document.getElementById('qb-left-pool-pane');
     const paperPane = document.getElementById('qb-right-paper-pane');
     document.querySelectorAll('.qb-mobile-tab').forEach(btn => {
       const t = btn.getAttribute('data-qb-tab');
-      const active = t === tabName;
+      const active = t === qbState.mobileTab;
       btn.className = `qb-mobile-tab flex-1 py-2.5 text-xs font-bold border-b-2 ${
         active
           ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400'
@@ -3009,7 +3071,7 @@
       }`;
     });
     if (poolPane && paperPane) {
-      if (tabName === 'pool') {
+      if (qbState.mobileTab === 'pool') {
         poolPane.classList.remove('hidden');
         poolPane.classList.add('flex');
         paperPane.classList.add('hidden');
@@ -3025,6 +3087,7 @@
 
   function initQuestionBuilder() {
     loadQbStateFromStorage();
+    switchQbMobileTab(qbState.mobileTab || 'paper');
 
     const openBtn = document.getElementById('open-question-builder-btn');
     if (openBtn) {
@@ -3035,6 +3098,7 @@
         } else {
           renderQbAll();
         }
+        switchQbMobileTab(qbState.mobileTab || 'paper');
         openModal('question-builder-modal');
       });
     }
@@ -3047,6 +3111,7 @@
         qbState.chapterKey = 'all';
         qbState.customSubjectEdited = false;
         qbState.subjectLine = getDefaultSubjectLineForTrade(qbState.tradeId, qbState.chapterKey);
+        saveQbStateToStorage();
         renderQbAll();
       });
     }
@@ -3058,6 +3123,7 @@
         if (!qbState.customSubjectEdited) {
           qbState.subjectLine = getDefaultSubjectLineForTrade(qbState.tradeId, qbState.chapterKey);
         }
+        saveQbStateToStorage();
         renderQbPool();
         renderQbPaper();
       });
@@ -3067,7 +3133,9 @@
     if (typeSelect) {
       typeSelect.addEventListener('change', (e) => {
         qbState.qType = e.target.value;
+        saveQbStateToStorage();
         renderQbPool();
+        renderQbPaper();
       });
     }
 
@@ -3082,7 +3150,9 @@
           syncQbInputsToState();
           saveQbStateToStorage();
           const marksEl = document.getElementById('qb-paper-marks-display');
+          const statTargetMarks = document.getElementById('qb-stat-target-marks');
           if (marksEl) marksEl.textContent = toBnNum(getEffectivePaperMarks() || qbState.targetMarks);
+          if (statTargetMarks) statTargetMarks.textContent = toBnNum(qbState.targetMarks);
         });
       }
     });
@@ -3119,6 +3189,7 @@
     if (poolSearch) {
       poolSearch.addEventListener('input', (e) => {
         qbState.poolSearch = e.target.value;
+        saveQbStateToStorage();
         renderQbPool();
       });
     }
@@ -3127,6 +3198,7 @@
     if (poolPriority) {
       poolPriority.addEventListener('change', (e) => {
         qbState.poolPriority = e.target.value;
+        saveQbStateToStorage();
         renderQbPool();
       });
     }
