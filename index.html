@@ -702,6 +702,15 @@
         <div class="flex flex-wrap items-center gap-2 ml-auto">
           <button
             type="button"
+            id="qb-load-t4-60-btn"
+            class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs sm:text-sm font-extrabold bg-gradient-to-r from-amber-500 to-rose-600 hover:from-amber-600 hover:to-rose-700 text-white shadow-md shadow-rose-500/20 transition-all"
+            title="বোর্ড ও অতিরিক্ত প্রশ্ন বিশ্লেষণ করে তৈরি ট্রেড-৪ এর ৬০ নম্বরের কমন টেস্ট প্রশ্নপত্র লোড করুন"
+          >
+            <i class="fa-solid fa-star"></i>
+            <span>ট্রেড-৪ (৬০ নম্বর) কমন সেট</span>
+          </button>
+          <button
+            type="button"
             id="qb-copy-paper-btn"
             class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs sm:text-sm font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all"
             title="প্রশ্নপত্রটি MS Word বা টেক্সট হিসেবে কপি করুন"
@@ -3092,6 +3101,8 @@ window.BILINGUAL_SYNONYMS = {"electricity": ["ইলেকট্রিসিট�
         const parsed = JSON.parse(saved);
         if (parsed && typeof parsed === 'object') {
           if (Array.isArray(parsed.items)) qbState.items = parsed.items;
+          if (parsed.tradeId) qbState.tradeId = parsed.tradeId;
+          if (parsed.qType) qbState.qType = parsed.qType;
           if (parsed.institution) qbState.institution = parsed.institution;
           if (parsed.examName) qbState.examName = parsed.examName;
           if (parsed.examTime) qbState.examTime = parsed.examTime;
@@ -3110,6 +3121,8 @@ window.BILINGUAL_SYNONYMS = {"electricity": ["ইলেকট্রিসিট�
     try {
       localStorage.setItem('vi_qb_state_v1', JSON.stringify({
         items: qbState.items,
+        tradeId: qbState.tradeId,
+        qType: qbState.qType,
         institution: qbState.institution,
         examName: qbState.examName,
         examTime: qbState.examTime,
@@ -3258,21 +3271,34 @@ window.BILINGUAL_SYNONYMS = {"electricity": ["ইলেকট্রিসিট�
     let generatedItems = [];
 
     if (qbState.qType === 'mixed_board') {
-      // Split marks across অতি সংক্ষিপ্ত (1), সংক্ষিপ্ত (2), রচনামূলক (4)
-      const vsBudget = Math.max(2, Math.round(targetMarks * 0.33));
-      const sBudget = Math.max(2, Math.round(targetMarks * 0.33));
-      const bBudget = Math.max(0, targetMarks - vsBudget - sBudget);
-
       const vsPool = getQbCandidatePool('very_short');
       const sPool = getQbCandidatePool('short');
       const bPool = getQbCandidatePool('broad');
 
-      generatedItems = [
-        ...pickQuestionsForBudget(vsPool, 1, vsBudget),
-        ...pickQuestionsForBudget(sPool, 2, sBudget),
-        ...(bBudget > 0 ? pickQuestionsForBudget(bPool, 4, bBudget) : [])
-      ];
-      qbState.instruction = `[দ্রষ্টব্য: ডান পাশের সংখ্যা প্রশ্নের পূর্ণমান জ্ঞাপক। সকল প্রশ্নের উত্তর দাও।]`;
+      if (targetMarks === 60) {
+        // Authentic BTEB (বাকাশিবো) 60-Mark Board Exam Structure:
+        // ক-বিভাগ: ১৫টি অতি সংক্ষিপ্ত (যেকোনো ১২টির উত্তর: ১×১২=১২)
+        // খ-বিভাগ: ১৬টি সংক্ষিপ্ত (যেকোনো ১২টির উত্তর: ২×১২=২৪)
+        // গ-বিভাগ: ৭টি রচনামূলক (যেকোনো ৪টির উত্তর: ৬×৪=২৪)
+        generatedItems = [
+          ...pickQuestionsForBudget(vsPool, 1, 15),
+          ...pickQuestionsForBudget(sPool, 2, 32),
+          ...pickQuestionsForBudget(bPool, 6, 42)
+        ];
+        qbState.instruction = `[দ্রষ্টব্য: ডান পাশের সংখ্যা প্রশ্নের পূর্ণমান জ্ঞাপক। ক-বিভাগ হতে যেকোনো ১২টি (১×১২=১২), খ-বিভাগ হতে যেকোনো ১২টি (২×১২=২৪) এবং গ-বিভাগ হতে যেকোনো ৪টি (৬×৪=২৪) প্রশ্নের উত্তর দাও।]`;
+      } else {
+        // Split marks across অতি সংক্ষিপ্ত (1), সংক্ষিপ্ত (2), রচনামূলক (4)
+        const vsBudget = Math.max(2, Math.round(targetMarks * 0.33));
+        const sBudget = Math.max(2, Math.round(targetMarks * 0.33));
+        const bBudget = Math.max(0, targetMarks - vsBudget - sBudget);
+
+        generatedItems = [
+          ...pickQuestionsForBudget(vsPool, 1, vsBudget),
+          ...pickQuestionsForBudget(sPool, 2, sBudget),
+          ...(bBudget > 0 ? pickQuestionsForBudget(bPool, 4, bBudget) : [])
+        ];
+        qbState.instruction = `[দ্রষ্টব্য: ডান পাশের সংখ্যা প্রশ্নের পূর্ণমান জ্ঞাপক। সকল প্রশ্নের উত্তর দাও।]`;
+      }
     } else {
       const pool = getQbCandidatePool(qbState.qType);
       const unitMark = qbState.qType === 'all' ? 2 : getDefaultMarkForType(qbState.qType);
@@ -3490,6 +3516,35 @@ window.BILINGUAL_SYNONYMS = {"electricity": ["ইলেকট্রিসিট�
     });
   }
 
+  // Helper: Compute effective paper marks (handles BTEB 60-mark optional choice structure)
+  function getEffectivePaperMarks() {
+    const rawSum = qbState.items.reduce((sum, item) => sum + (Number(item.marks) || 0), 0);
+    if (qbState.qType === 'mixed_board' && Number(qbState.targetMarks) === 60 && qbState.items.length >= 28) {
+      return 60;
+    }
+    return rawSum;
+  }
+
+  function getSectionHeaderForMixedBoard(baseType) {
+    const isBteb60 = Number(qbState.targetMarks) === 60;
+    if (baseType === 'very_short') {
+      return isBteb60
+        ? 'ক-বিভাগ: অতি সংক্ষিপ্ত প্রশ্ন (যেকোনো ১২টি প্রশ্নের উত্তর দাও: ১ × ১২ = ১২)'
+        : 'ক-বিভাগ: অতি সংক্ষিপ্ত প্রশ্ন';
+    }
+    if (baseType === 'short') {
+      return isBteb60
+        ? 'খ-বিভাগ: সংক্ষিপ্ত প্রশ্ন (যেকোনো ১২টি প্রশ্নের উত্তর দাও: ২ × ১২ = ২৪)'
+        : 'খ-বিভাগ: সংক্ষিপ্ত প্রশ্ন';
+    }
+    if (baseType === 'broad') {
+      return isBteb60
+        ? 'গ-বিভাগ: রচনামূলক প্রশ্ন (যেকোনো ৪টি প্রশ্নের উত্তর দাও: ৬ × ৪ = ২৪)'
+        : 'গ-বিভাগ: রচনামূলক প্রশ্ন';
+    }
+    return '';
+  }
+
   // Render Right Pane: Live Exam Question Paper Preview & Editor
   function renderQbPaper() {
     syncQbInputsToState();
@@ -3505,7 +3560,7 @@ window.BILINGUAL_SYNONYMS = {"electricity": ["ইলেকট্রিসিট�
     const statCurrentMarks = document.getElementById('qb-stat-current-marks');
     const mobilePaperCount = document.getElementById('qb-mobile-paper-count');
 
-    const totalCurrentMarks = qbState.items.reduce((sum, item) => sum + (Number(item.marks) || 0), 0);
+    const totalCurrentMarks = getEffectivePaperMarks();
 
     if (titleEl) titleEl.textContent = qbState.examName;
 
@@ -3565,6 +3620,16 @@ window.BILINGUAL_SYNONYMS = {"electricity": ["ইলেকট্রিসিট�
     }
 
     dropzone.innerHTML = qbState.items.map((item, idx) => {
+      const prevType = idx > 0 ? qbState.items[idx - 1].base_type : null;
+      const showSecBanner = qbState.qType === 'mixed_board' && item.base_type !== prevType;
+      const secBannerTitle = showSecBanner ? getSectionHeaderForMixedBoard(item.base_type) : '';
+      const secBannerHtml = secBannerTitle
+        ? `<div class="mt-3 mb-1.5 px-3.5 py-2 rounded-xl bg-indigo-500/10 dark:bg-indigo-950/60 border border-indigo-500/30 text-xs sm:text-sm font-extrabold text-indigo-700 dark:text-indigo-300 flex items-center gap-2">
+            <i class="fa-solid fa-layer-group"></i>
+            <span>${escapeHtml(secBannerTitle)}</span>
+          </div>`
+        : '';
+
       const isEditing = qbState.editingItemId === item.uid;
       const boardTagHtml = (qbState.showBoardTags && item.board_years && item.board_years.length > 0)
         ? `<span class="text-xs font-semibold text-emerald-600 dark:text-emerald-400 ml-1">[${formatBoardYearsText(item.board_years)}]</span>`
@@ -3572,6 +3637,7 @@ window.BILINGUAL_SYNONYMS = {"electricity": ["ইলেকট্রিসিট�
 
       if (isEditing) {
         return `
+          ${secBannerHtml}
           <div
             data-paper-uid="${item.uid}"
             data-paper-idx="${idx}"
@@ -3632,6 +3698,7 @@ window.BILINGUAL_SYNONYMS = {"electricity": ["ইলেকট্রিসিট�
       }
 
       return `
+        ${secBannerHtml}
         <div
           draggable="true"
           data-paper-uid="${item.uid}"
@@ -3953,7 +4020,7 @@ window.BILINGUAL_SYNONYMS = {"electricity": ["ইলেকট্রিসিট�
   // Format Exam Paper for Print / PDF and MS Word Copy
   function buildPrintableExamPaperHtml() {
     syncQbInputsToState();
-    const totalCurrentMarks = qbState.items.reduce((sum, item) => sum + (Number(item.marks) || 0), 0);
+    const totalCurrentMarks = getEffectivePaperMarks();
     const tradeMeta = TRADES_META[qbState.tradeId] || TRADES_META['trade-3'];
     const chLabel = qbState.chapterKey === 'all'
       ? ''
@@ -3981,10 +4048,17 @@ window.BILINGUAL_SYNONYMS = {"electricity": ["ইলেকট্রিসিট�
 
         <div class="space-y-3">
           ${qbState.items.map((item, idx) => {
+            const prevType = idx > 0 ? qbState.items[idx - 1].base_type : null;
+            const showSecBanner = qbState.qType === 'mixed_board' && item.base_type !== prevType;
+            const secBannerTitle = showSecBanner ? getSectionHeaderForMixedBoard(item.base_type) : '';
+            const secHtml = secBannerTitle
+              ? `<div class="pt-3 pb-1 border-b border-black font-bold text-base">${escapeHtml(secBannerTitle)}</div>`
+              : '';
             const bTag = (qbState.showBoardTags && item.board_years && item.board_years.length > 0)
               ? ` <span class="text-xs font-normal">[${formatBoardYearsText(item.board_years)}]</span>`
               : '';
             return `
+              ${secHtml}
               <div class="flex items-start justify-between gap-4 py-1" style="break-inside: avoid;">
                 <div class="flex-1 text-base leading-relaxed">
                   <div>
@@ -4011,7 +4085,7 @@ window.BILINGUAL_SYNONYMS = {"electricity": ["ইলেকট্রিসিট�
 
   function formatExamPaperAsText() {
     syncQbInputsToState();
-    const totalCurrentMarks = qbState.items.reduce((sum, item) => sum + (Number(item.marks) || 0), 0);
+    const totalCurrentMarks = getEffectivePaperMarks();
     const tradeMeta = TRADES_META[qbState.tradeId] || TRADES_META['trade-3'];
     const chLabel = qbState.chapterKey === 'all'
       ? ''
@@ -4028,6 +4102,14 @@ window.BILINGUAL_SYNONYMS = {"electricity": ["ইলেকট্রিসিট�
     ];
 
     qbState.items.forEach((item, idx) => {
+      const prevType = idx > 0 ? qbState.items[idx - 1].base_type : null;
+      if (qbState.qType === 'mixed_board' && item.base_type !== prevType) {
+        const secTitle = getSectionHeaderForMixedBoard(item.base_type);
+        if (secTitle) {
+          lines.push('');
+          lines.push(`=== ${secTitle} ===`);
+        }
+      }
       const bTag = (qbState.showBoardTags && item.board_years && item.board_years.length > 0)
         ? ` [${formatBoardYearsText(item.board_years)}]`
         : '';
@@ -4038,6 +4120,96 @@ window.BILINGUAL_SYNONYMS = {"electricity": ["ইলেকট্রিসিট�
     });
 
     return lines.join('\n');
+  }
+
+  // Curated Trade-4 (IoT Basics-4) 60-Mark Common Test Question Paper (Based on Board + Extra Analysis)
+  function loadTrade4Common60Paper() {
+    const curatedSpecs = [
+      // ক-বিভাগ: অতি সংক্ষিপ্ত প্রশ্ন (১৫টি — যেকোনো ১২টির উত্তর: ১×১২=১২)
+      { id: 'q-292', marks: 1, alt: '' },
+      { id: 'q-295', marks: 1, alt: 'অপারেটর কী?' },
+      { id: 'q-298', marks: 1, alt: '' },
+      { id: 'q-308', marks: 1, alt: 'ভেরিয়েবল কী?' },
+      { id: 'q-311', marks: 1, alt: 'টাপল কী?' },
+      { id: 'q-382', marks: 1, alt: '' },
+      { id: 'q-368', marks: 1, alt: '৮০৫১ মাইক্রোকন্ট্রোলারের পিন সংখ্যা কত?' },
+      { id: 'q-375', marks: 1, alt: '' },
+      { id: 'q-428', marks: 1, alt: 'আইওটি বলতে কী বুঝায়?' },
+      { id: 'q-433', marks: 1, alt: '৪র্থ শিল্পবিপ্লবের দুটি উদাহরণ দাও।' },
+      { id: 'q-443', marks: 1, alt: '' },
+      { id: 'q-458', marks: 1, alt: 'র‍্যানসমওয়্যার কী?' },
+      { id: 'q-503', marks: 1, alt: '' },
+      { id: 'q-506', marks: 1, alt: 'সিমুলেশন কী?' },
+      { id: 'q-521', marks: 1, alt: 'Arduino UNO কী?' },
+
+      // খ-বিভাগ: সংক্ষিপ্ত প্রশ্ন (১৬টি — যেকোনো ১২টির উত্তর: ২×১২=২৪)
+      { id: 'q-330', marks: 2, alt: '' },
+      { id: 'q-331', marks: 2, alt: '' },
+      { id: 'q-344', marks: 2, alt: 'লাইব্রেরি বা বিল্ট-ইন (Built-in) ফাংশন বলতে কী বুঝায়?' },
+      { id: 'q-341', marks: 2, alt: 'অ্যালগরিদমের বৈশিষ্ট্য কী কী?' },
+      { id: 'q-353', marks: 2, alt: 'মেশিন ভাষার সুবিধা ও অসুবিধা কী?' },
+      { id: 'q-397', marks: 2, alt: 'মাইক্রোকন্ট্রোলার ও মাইক্রোপ্রসেসরের পার্থক্য কী?' },
+      { id: 'q-402', marks: 2, alt: 'ব্রেডবোর্ড কী?' },
+      { id: 'q-403', marks: 2, alt: 'মাইক্রোকন্ট্রোলারে VCC এবং GND পিনের কাজ কী?' },
+      { id: 'q-410', marks: 2, alt: '' },
+      { id: 'q-471', marks: 2, alt: 'হেলথ-কেয়ারে আইওটি ডিভাইসের ভূমিকা লেখ।' },
+      { id: 'q-476', marks: 2, alt: 'ক্লাউড কম্পিউটিং-এর সুবিধাগুলো লেখ।' },
+      { id: 'q-466', marks: 2, alt: 'চতুর্থ শিল্পবিপ্লবের পিলার কয়টি ও কী কী?' },
+      { id: 'q-473', marks: 2, alt: 'সাইবার সিকিউরিটির ক্ষতিকর প্রভাব কী?' },
+      { id: 'q-530', marks: 2, alt: 'সেন্সর কেন দরকার হয়?' },
+      { id: 'q-532', marks: 2, alt: 'আরডুইনো আইডিই (IDE) কী?' },
+      { id: 'q-524', marks: 2, alt: 'ডিভাইস টু ডিভাইস কমিউনিকেশন বর্ণনা কর।' },
+
+      // গ-বিভাগ: রচনামূলক প্রশ্ন (৭টি — যেকোনো ৪টির উত্তর: ৬×৪=২৪)
+      { id: 'q-361', marks: 6, alt: 'কন্ডিশনাল স্টেটমেন্টগুলোর স্ট্রাকচার ও কাজ লেখ।' },
+      { id: 'q-360', marks: 6, alt: 'লিস্ট কী? লিস্টের বেসিক মেথডগুলোর বর্ণনা কর।' },
+      { id: 'q-418', marks: 6, alt: 'মাইক্রোকন্ট্রোলারের অভ্যন্তরীণ কম্পোনেন্টসমূহ বর্ণনা কর।' },
+      { id: 'q-420', marks: 6, alt: '৮০৫১ অথবা PIC 16F84A মাইক্রোকন্ট্রোলারের পিন ডায়াগ্রাম অঙ্কনপূর্বক পিনসমূহের কাজ লেখ।' },
+      { id: 'q-495', marks: 6, alt: 'আইওটির ব্যবহারিক প্রয়োগক্ষেত্রসমূহ উদাহরণসহ লেখ।' },
+      { id: 'q-497', marks: 6, alt: 'বিগ ডাটা (Big Data) কাকে বলে? এর বৈশিষ্ট্যগুলো লেখ।' },
+      { id: 'q-544', marks: 6, alt: 'আইওটি সিস্টেম বাস্তবায়নের ধাপসমূহ ও কয়েকটি প্রটোকলের কাজ আলোচনা কর।' }
+    ];
+
+    qbState.tradeId = 'trade-4';
+    qbState.chapterKey = 'all';
+    qbState.qType = 'mixed_board';
+    qbState.targetMarks = 60;
+    qbState.examName = 'এসএসসি (ভোকেশনাল) চূড়ান্ত মডেল টেস্ট - ২০২৬';
+    qbState.examTime = '৩ ঘণ্টা';
+    qbState.instruction = '[দ্রষ্টব্য: ডান পাশের সংখ্যা প্রশ্নের পূর্ণমান জ্ঞাপক। ক-বিভাগ হতে যেকোনো ১২টি (১×১২=১২), খ-বিভাগ হতে যেকোনো ১২টি (২×১২=২৪) এবং গ-বিভাগ হতে যেকোনো ৪টি (৬×৪=২৪) প্রশ্নের উত্তর দাও।]';
+
+    const trEl = document.getElementById('qb-trade-select');
+    const tpEl = document.getElementById('qb-type-select');
+    const mkEl = document.getElementById('qb-total-marks-input');
+    const exEl = document.getElementById('qb-exam-name-input');
+    const tmEl = document.getElementById('qb-exam-time-input');
+    const inEl = document.getElementById('qb-instruction-input');
+
+    if (trEl) trEl.value = 'trade-4';
+    renderQbChapterOptions();
+    const chEl = document.getElementById('qb-chapter-select');
+    if (chEl) chEl.value = 'all';
+    if (tpEl) tpEl.value = 'mixed_board';
+    if (mkEl) mkEl.value = '60';
+    if (exEl) exEl.value = qbState.examName;
+    if (tmEl) tmEl.value = qbState.examTime;
+    if (inEl) inEl.value = qbState.instruction;
+
+    const items = [];
+    curatedSpecs.forEach(spec => {
+      const q = state.questions.find(item => item.id === spec.id);
+      if (q) {
+        const pItem = createPaperItemFromQuestion(q, spec.marks);
+        if (spec.alt) pItem.altQuestion = spec.alt;
+        items.push(pItem);
+      }
+    });
+
+    qbState.items = items;
+    saveQbStateToStorage();
+    renderQbAll();
+    renderAll();
+    showToast('ট্রেড-৪ এর ৬০ নম্বরের কমন বোর্ড মডেল টেস্ট প্রশ্নপত্র লোড করা হয়েছে!');
   }
 
   function switchQbMobileTab(tabName) {
@@ -4160,6 +4332,12 @@ window.BILINGUAL_SYNONYMS = {"electricity": ["ইলেকট্রিসিট�
     const appendBtn = document.getElementById('qb-append-btn');
     if (appendBtn) {
       appendBtn.addEventListener('click', () => autoGenerateExamPaper(true));
+    }
+
+    // 1-Click Curated Trade-4 (60 Marks) Common Test Question Set Button
+    const loadT4CommonBtn = document.getElementById('qb-load-t4-60-btn');
+    if (loadT4CommonBtn) {
+      loadT4CommonBtn.addEventListener('click', () => loadTrade4Common60Paper());
     }
 
     // Pool Search & Priority Filter
