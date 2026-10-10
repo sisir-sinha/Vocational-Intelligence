@@ -870,6 +870,9 @@
     const sortSelect = document.getElementById('sort-by-select');
     if (sortSelect) sortSelect.value = state.sortBy;
 
+    const sidebarSortSelect = document.getElementById('sidebar-sort-select');
+    if (sidebarSortSelect) sidebarSortSelect.value = state.sortBy;
+
     const scopeSelect = document.getElementById('search-scope-select');
     if (scopeSelect) scopeSelect.value = state.searchScope;
 
@@ -1732,6 +1735,16 @@
     if (sortSelect) {
       sortSelect.addEventListener('change', (e) => {
         state.sortBy = e.target.value;
+        syncControlInputs();
+        renderAll();
+      });
+    }
+
+    const sidebarSortSelect = document.getElementById('sidebar-sort-select');
+    if (sidebarSortSelect) {
+      sidebarSortSelect.addEventListener('change', (e) => {
+        state.sortBy = e.target.value;
+        syncControlInputs();
         renderAll();
       });
     }
