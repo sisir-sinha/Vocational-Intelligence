@@ -689,11 +689,11 @@
                 স্মার্ট প্রশ্নপত্র তৈরি (Make Question Studio)
               </h3>
               <span class="hidden md:inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30">
-                Drag &amp; Drop + Live Edit
+                Double-Click + Live Edit
               </span>
             </div>
             <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
-              ট্রেড, অধ্যায়, প্রশ্নের ধরন ও নম্বর নির্বাচন করে স্বয়ংক্রিয়ভাবে প্রশ্নপত্র তৈরি করুন এবং ড্র্যাগ-অ্যান্ড-ড্রপ বা এডিট করে কাস্টমাইজ করুন
+              ট্রেড, অধ্যায়, প্রশ্নের ধরন ও নম্বর নির্বাচন করে প্রশ্নপত্র তৈরি করুন। যেকোনো বিকল্প (অথবা) প্রশ্নে ডাবল-ক্লিক করলে তা একক প্রশ্ন হিসেবে যুক্ত হবে।
             </p>
           </div>
         </div>
@@ -738,9 +738,9 @@
         </div>
       </div>
 
-      <!-- Generator Configuration Ribbon (Trade > Chapter > Question Type > Mark > Exam Name > Time) -->
+      <!-- Generator Configuration Ribbon (Trade > Chapter > Question Type > Mark) -->
       <div class="bg-slate-50 dark:bg-slate-900/90 px-4 sm:px-6 py-3 border-b border-slate-200 dark:border-slate-800 shrink-0">
-        <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2.5 items-end">
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 items-end">
           <!-- 1. Trade Select -->
           <div class="col-span-1">
             <label for="qb-trade-select" class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">
@@ -750,8 +750,8 @@
               id="qb-trade-select"
               class="w-full px-2.5 py-2 rounded-xl bg-slate-900 dark:bg-slate-800 border border-slate-700 text-xs sm:text-sm font-bold text-white focus:outline-none focus:border-indigo-500"
             >
-              <option value="trade-3" selected>ট্রেড-৩ (IoT Basics-3)</option>
-              <option value="trade-4">ট্রেড-৪ (IoT Basics-4)</option>
+              <option value="trade-4" selected>ট্রেড-৪ (IoT Basics-4)</option>
+              <option value="trade-3">ট্রেড-৩ (IoT Basics-3)</option>
               <option value="trade-1">ট্রেড-১ (IoT Basics-1)</option>
               <option value="trade-2">ট্রেড-২ (IoT Basics-2)</option>
               <option value="all">সকল ট্রেড</option>
@@ -780,10 +780,10 @@
               id="qb-type-select"
               class="w-full px-2.5 py-2 rounded-xl bg-slate-900 dark:bg-slate-800 border border-slate-700 text-xs sm:text-sm font-bold text-white focus:outline-none focus:border-indigo-500"
             >
+              <option value="mixed_board" selected>টেস্ট স্ট্যান্ডার্ড (ক+খ+গ বিভাগ)</option>
               <option value="very_short">অতি সংক্ষিপ্ত (১ মান)</option>
-              <option value="short" selected>সংক্ষিপ্ত প্রশ্ন (২ মান)</option>
+              <option value="short">সংক্ষিপ্ত প্রশ্ন (২ মান)</option>
               <option value="broad">রচনামূলক প্রশ্ন (৪ মান)</option>
-              <option value="mixed_board">বোর্ড স্ট্যান্ডার্ড (ক+খ+গ বিভাগ)</option>
               <option value="all">সকল ধরন</option>
             </select>
           </div>
@@ -799,61 +799,15 @@
                 id="qb-total-marks-input"
                 min="1"
                 max="200"
-                value="10"
+                value="60"
                 class="w-full px-2.5 py-2 rounded-xl bg-slate-900 dark:bg-slate-800 border border-slate-700 text-xs sm:text-sm font-bold text-white focus:outline-none focus:border-indigo-500"
-                title="পরীক্ষার মোট নম্বর দিন (যেমন: 10, 20, 30, 60)"
+                title="পরীক্ষার মোট নম্বর দিন (যেমন: 60, 30, 20, 10)"
               />
             </div>
           </div>
 
-          <!-- 5. Exam Name Input -->
-          <div class="col-span-1 sm:col-span-2 lg:col-span-1">
-            <label for="qb-exam-name-input" class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">
-              ৫. পরীক্ষার নাম (Exam Name)
-            </label>
-            <input
-              type="text"
-              id="qb-exam-name-input"
-              list="qb-exam-name-presets"
-              value="শ্রেণি অভীক্ষা (Class Test) - ২০২৬"
-              placeholder="পরীক্ষার নাম লেখ..."
-              class="w-full px-2.5 py-2 rounded-xl bg-slate-900 dark:bg-slate-800 border border-slate-700 text-xs sm:text-sm font-bold text-white focus:outline-none focus:border-indigo-500"
-            />
-            <datalist id="qb-exam-name-presets">
-              <option value="শ্রেণি অভীক্ষা (Class Test) - ২০২৬"></option>
-              <option value="মডেল টেস্ট পরীক্ষা - ২০২৬"></option>
-              <option value="অর্ধ-বার্ষিক পরীক্ষা - ২০২৬"></option>
-              <option value="নির্বাচনী পরীক্ষা - ২০২৬"></option>
-              <option value="এসএসসি (ভোকেশনাল) চূড়ান্ত মডেল পরীক্ষা - ২০২৬"></option>
-            </datalist>
-          </div>
-
-          <!-- 6. Exam Time Input -->
-          <div class="col-span-1">
-            <label for="qb-exam-time-input" class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">
-              ৬. সময় (Time)
-            </label>
-            <input
-              type="text"
-              id="qb-exam-time-input"
-              list="qb-exam-time-presets"
-              value="৩০ মিনিট"
-              placeholder="যেমন: ৩০ মিনিট"
-              class="w-full px-2.5 py-2 rounded-xl bg-slate-900 dark:bg-slate-800 border border-slate-700 text-xs sm:text-sm font-bold text-white focus:outline-none focus:border-indigo-500"
-            />
-            <datalist id="qb-exam-time-presets">
-              <option value="২০ মিনিট"></option>
-              <option value="৩০ মিনিট"></option>
-              <option value="৪০ মিনিট"></option>
-              <option value="১ ঘণ্টা"></option>
-              <option value="১ ঘণ্টা ৩০ মিনিট"></option>
-              <option value="২ ঘণ্টা"></option>
-              <option value="৩ ঘণ্টা"></option>
-            </datalist>
-          </div>
-
-          <!-- 7. Generate & Append Buttons -->
-          <div class="col-span-2 sm:col-span-2 lg:col-span-1 flex items-center gap-1.5">
+          <!-- 5. Generate & Append Buttons -->
+          <div class="col-span-2 sm:col-span-1 lg:col-span-1 flex items-center gap-1.5">
             <button
               type="button"
               id="qb-generate-btn"
@@ -904,9 +858,9 @@
           <!-- Pool Search & Filter Toolbar -->
           <div class="p-3 border-b border-slate-200 dark:border-slate-800 space-y-2 bg-white/80 dark:bg-slate-900/80 shrink-0">
             <div class="flex items-center justify-between gap-2">
-              <span class="text-xs font-extrabold uppercase tracking-wider text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
+              <span class="text-xs font-extrabold text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
                 <i class="fa-solid fa-hand-pointer text-indigo-500"></i>
-                <span>সাজেশন প্রশ্নব্যাংক (ড্র্যাগ করুন অথবা + চাপুন)</span>
+                <span>সাজেশন পুল (‘+’ চাপুন বা ‘অথবা’ প্রশ্নে ডাবল-ক্লিক করুন)</span>
               </span>
               <span id="qb-pool-count-badge" class="text-xs font-bold px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-400">০টি</span>
             </div>
@@ -997,34 +951,53 @@
               id="qb-paper-canvas"
               class="max-w-3xl mx-auto bg-white dark:bg-slate-900 rounded-2xl border-2 border-slate-300 dark:border-slate-800 shadow-xl p-5 sm:p-8 transition-all"
             >
-              <!-- Editable Exam Paper Header -->
-              <div class="border-b-2 border-slate-800 dark:border-slate-700 pb-4 mb-5 text-center space-y-1.5">
+              <!-- Editable Exam Paper Header (All fields directly editable in preview!) -->
+              <div class="pb-3 mb-4 text-center space-y-1">
                 <input
                   type="text"
                   id="qb-institution-input"
-                  value="বাংলাদেশ কারিগরি শিক্ষা বোর্ড / ভোকেশনাল ইনস্টিটিউট"
+                  value="সফির উদ্দিন হাই স্কুল এন্ড কলেজ"
                   placeholder="প্রতিষ্ঠানের নাম লিখুন..."
-                  class="w-full text-center text-base sm:text-lg font-extrabold text-slate-900 dark:text-white bg-transparent border-b border-transparent hover:border-slate-300 dark:hover:border-slate-700 focus:border-indigo-500 focus:outline-none"
-                  title="ক্লিক করে প্রতিষ্ঠানের নাম পরিবর্তন করুন"
+                  class="w-full text-center text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white bg-transparent border-b border-transparent hover:border-slate-300 dark:hover:border-slate-700 focus:border-indigo-500 focus:outline-none"
+                  title="ক্লিক করে প্রতিষ্ঠানের নাম এডিট করুন"
                 />
-                <div id="qb-paper-exam-title" class="text-sm sm:text-base font-bold text-slate-800 dark:text-slate-200">
-                  শ্রেণি অভীক্ষা (Class Test) - ২০২৬
-                </div>
-                <div id="qb-paper-subject-line" class="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">
-                  বিষয়: ট্রেড-৩ (IoT Basics-3) • অধ্যায়-১: কম্পিউটার পেরিফেরালস বেসিকস
-                </div>
-                <div class="flex items-center justify-between pt-2 text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200">
-                  <span>সময়: <span id="qb-paper-time-display">৩০ মিনিট</span></span>
-                  <span>পূর্ণমান: <span id="qb-paper-marks-display">১০</span></span>
+                <input
+                  type="text"
+                  id="qb-exam-name-input"
+                  value="দশম (ভোকেশনাল) শ্রেণি টেস্ট পরীক্ষা-২০২৬"
+                  placeholder="পরীক্ষার নাম লিখুন..."
+                  class="w-full text-center text-sm sm:text-base font-semibold text-slate-800 dark:text-slate-200 bg-transparent border-b border-transparent hover:border-slate-300 dark:hover:border-slate-700 focus:border-indigo-500 focus:outline-none"
+                  title="ক্লিক করে পরীক্ষার নাম এডিট করুন"
+                />
+                <input
+                  type="text"
+                  id="qb-subject-line-input"
+                  value="বিষয়: আইটি সাপোর্ট এন্ড আইওটি বেসিকস-৪ (Trade-4)"
+                  placeholder="বিষয়ের নাম লিখুন..."
+                  class="w-full text-center text-sm sm:text-base font-medium text-slate-800 dark:text-slate-200 bg-transparent border-b border-transparent hover:border-slate-300 dark:hover:border-slate-700 focus:border-indigo-500 focus:outline-none"
+                  title="ক্লিক করে বিষয়ের লাইন এডিট করুন"
+                />
+                <div class="flex items-center justify-between pt-2 text-xs sm:text-sm font-bold text-slate-900 dark:text-slate-100">
+                  <div class="flex items-center gap-1">
+                    <span>সময়:</span>
+                    <input
+                      type="text"
+                      id="qb-exam-time-input"
+                      value="৩ ঘন্টা"
+                      class="w-28 sm:w-36 font-bold text-slate-900 dark:text-white bg-transparent border-b border-transparent hover:border-slate-300 dark:hover:border-slate-700 focus:border-indigo-500 focus:outline-none"
+                      title="ক্লিক করে সময় এডিট করুন"
+                    />
+                  </div>
+                  <div>পূর্ণমান: <span id="qb-paper-marks-display">৬০</span></div>
                 </div>
                 <!-- Editable Instruction Note -->
                 <div class="pt-1">
                   <input
                     type="text"
                     id="qb-instruction-input"
-                    value="[দ্রষ্টব্য: ডান পাশের সংখ্যা প্রশ্নের পূর্ণমান জ্ঞাপক। সকল প্রশ্নের উত্তর দাও।]"
-                    class="w-full text-center text-xs sm:text-sm italic text-slate-600 dark:text-slate-400 bg-transparent border-b border-transparent hover:border-slate-300 dark:hover:border-slate-700 focus:border-indigo-500 focus:outline-none"
-                    title="ক্লিক করে নির্দেশনাটি পরিবর্তন করুন"
+                    value="[দ্রষ্টব্য: ক-বিভাগের সকল, খ-বিভাগের যে কোন ১০টি এবং গ-বিভাগের যে কোন ৫টি প্রশ্নের উত্তর দাও]"
+                    class="w-full text-center text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 bg-transparent border-b border-transparent hover:border-slate-300 dark:hover:border-slate-700 focus:border-indigo-500 focus:outline-none"
+                    title="ক্লিক করে নির্দেশনাটি এডিট করুন"
                   />
                 </div>
               </div>
@@ -3066,24 +3039,42 @@ window.BILINGUAL_SYNONYMS = {"electricity": ["ইলেকট্রিসিট�
   }
 
   // ============================================================================
-  // MAKE QUESTION STUDIO (প্রশ্নপত্র তৈরি ও ড্র্যাগ-অ্যান্ড-ড্রপ বিল্ডার)
+  // MAKE QUESTION STUDIO (প্রশ্নপত্র তৈরি ও ডাবল-ক্লিক সিঙ্গেল প্রশ্ন সিলেক্টর)
   // ============================================================================
+  function getDefaultSubjectLineForTrade(tradeId, chapterKey) {
+    const map = {
+      'trade-1': 'বিষয়: আইটি সাপোর্ট এন্ড আইওটি বেসিকস-১ (Trade-1)',
+      'trade-2': 'বিষয়: আইটি সাপোর্ট এন্ড আইওটি বেসিকস-২ (Trade-2)',
+      'trade-3': 'বিষয়: আইটি সাপোর্ট এন্ড আইওটি বেসিকস-৩ (Trade-3)',
+      'trade-4': 'বিষয়: আইটি সাপোর্ট এন্ড আইওটি বেসিকস-৪ (Trade-4)',
+      'all': 'বিষয়: আইটি সাপোর্ট এন্ড আইওটি বেসিকস (সকল ট্রেড)'
+    };
+    const base = map[tradeId] || map['trade-4'];
+    if (chapterKey && chapterKey !== 'all') {
+      const chText = chapterKey.includes('::') ? chapterKey.split('::')[1] : chapterKey;
+      return `${base} • ${chText}`;
+    }
+    return base;
+  }
+
   const qbState = {
-    tradeId: 'trade-3',
+    tradeId: 'trade-4',
     chapterKey: 'all',
-    qType: 'short', // 'very_short', 'short', 'broad', 'mixed_board', 'all'
-    targetMarks: 10,
-    examName: 'শ্রেণি অভীক্ষা (Class Test) - ২০২৬',
-    examTime: '৩০ মিনিট',
-    institution: 'বাংলাদেশ কারিগরি শিক্ষা বোর্ড / ভোকেশনাল ইনস্টিটিউট',
-    instruction: '[দ্রষ্টব্য: ডান পাশের সংখ্যা প্রশ্নের পূর্ণমান জ্ঞাপক। সকল প্রশ্নের উত্তর দাও।]',
+    qType: 'mixed_board', // 'mixed_board', 'very_short', 'short', 'broad', 'all'
+    targetMarks: 60,
+    institution: 'সফির উদ্দিন হাই স্কুল এন্ড কলেজ',
+    examName: 'দশম (ভোকেশনাল) শ্রেণি টেস্ট পরীক্ষা-২০২৬',
+    subjectLine: 'বিষয়: আইটি সাপোর্ট এন্ড আইওটি বেসিকস-৪ (Trade-4)',
+    customSubjectEdited: false,
+    examTime: '৩ ঘন্টা',
+    instruction: '[দ্রষ্টব্য: ক-বিভাগের সকল, খ-বিভাগের যে কোন ১০টি এবং গ-বিভাগের যে কোন ৫টি প্রশ্নের উত্তর দাও]',
     showBoardTags: false,
     poolSearch: '',
     poolPriority: 'all', // 'all', 'top', 'board', '2026', 'starred'
     mobileTab: 'paper', // 'pool' or 'paper'
     editingItemId: null, // item uid currently in inline edit mode
     generationSeed: 0,
-    items: [] // Array of { uid, sourceId, question, altQuestion, marks, base_type, board_years, chapter, trade_id }
+    items: [] // Array of { uid, sourceId, question, marks, base_type, board_years, chapter, trade_id }
   };
 
   function getDefaultMarkForType(baseType) {
@@ -3096,7 +3087,7 @@ window.BILINGUAL_SYNONYMS = {"electricity": ["ইলেকট্রিসিট�
 
   function loadQbStateFromStorage() {
     try {
-      const saved = localStorage.getItem('vi_qb_state_v1');
+      const saved = localStorage.getItem('vi_qb_state_v2');
       if (saved) {
         const parsed = JSON.parse(saved);
         if (parsed && typeof parsed === 'object') {
@@ -3105,6 +3096,7 @@ window.BILINGUAL_SYNONYMS = {"electricity": ["ইলেকট্রিসিট�
           if (parsed.qType) qbState.qType = parsed.qType;
           if (parsed.institution) qbState.institution = parsed.institution;
           if (parsed.examName) qbState.examName = parsed.examName;
+          if (parsed.subjectLine) qbState.subjectLine = parsed.subjectLine;
           if (parsed.examTime) qbState.examTime = parsed.examTime;
           if (parsed.targetMarks) qbState.targetMarks = parsed.targetMarks;
           if (parsed.instruction) qbState.instruction = parsed.instruction;
@@ -3119,12 +3111,13 @@ window.BILINGUAL_SYNONYMS = {"electricity": ["ইলেকট্রিসিট�
 
   function saveQbStateToStorage() {
     try {
-      localStorage.setItem('vi_qb_state_v1', JSON.stringify({
+      localStorage.setItem('vi_qb_state_v2', JSON.stringify({
         items: qbState.items,
         tradeId: qbState.tradeId,
         qType: qbState.qType,
         institution: qbState.institution,
         examName: qbState.examName,
+        subjectLine: qbState.subjectLine,
         examTime: qbState.examTime,
         targetMarks: qbState.targetMarks,
         instruction: qbState.instruction,
@@ -3145,20 +3138,38 @@ window.BILINGUAL_SYNONYMS = {"electricity": ["ইলেকট্রিসিট�
     return qbState.items.some(item => item.sourceId === qid);
   }
 
-  function createPaperItemFromQuestion(q, customMarks) {
+  function createPaperItemFromQuestion(q, customMarks, customText) {
     const marks = customMarks !== undefined ? customMarks : getDefaultMarkForType(q.base_type);
-    const firstAlt = q.alternatives && q.alternatives.length > 0 ? q.alternatives[0].text : '';
     return {
       uid: `pitem-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
       sourceId: q.id,
-      question: q.question,
-      altQuestion: firstAlt,
-      marks: Number(marks) || 2,
+      question: customText || q.question,
+      marks: Number(marks) || 1,
       base_type: q.base_type,
       board_years: q.board_years || [],
       chapter: q.chapter || '',
-      trade_id: q.trade_id || 'trade-3'
+      chapter_num: q.chapter_num || 1,
+      trade_id: q.trade_id || 'trade-4'
     };
+  }
+
+  // Place a question (or one of its Alternate `অথবা` variants) as a single standalone question in the paper
+  function addOrReplaceSingleQuestion(q, chosenText) {
+    const textToUse = (chosenText || q.question || '').trim();
+    const existingIdx = qbState.items.findIndex(item => item.sourceId === q.id);
+    if (existingIdx !== -1) {
+      qbState.items[existingIdx].question = textToUse;
+      saveQbStateToStorage();
+      renderQbAll();
+      renderAll();
+      showToast(`প্রশ্ন ${toBnNum(existingIdx + 1)}-এ নির্বাচিত প্রশ্নটি একক প্রশ্ন হিসেবে বসানো হয়েছে!`);
+    } else {
+      qbState.items.push(createPaperItemFromQuestion(q, undefined, textToUse));
+      saveQbStateToStorage();
+      renderQbAll();
+      renderAll();
+      showToast('প্রশ্নপত্রে একক প্রশ্ন হিসেবে যুক্ত হয়েছে!');
+    }
   }
 
   function toggleQuestionInPaperById(qid) {
@@ -3172,7 +3183,7 @@ window.BILINGUAL_SYNONYMS = {"electricity": ["ইলেকট্রিসিট�
       if (!q) return;
       qbState.items.push(createPaperItemFromQuestion(q));
       saveQbStateToStorage();
-      showToast('প্রশ্নপত্রে প্রশ্নটি যুক্ত হয়েছে! ("প্রশ্নপত্র তৈরি" বাটনে ক্লিক করে দেখুন)');
+      showToast('প্রশ্নপত্রে প্রশ্নটি যুক্ত হয়েছে! ("প্রশ্ন তৈরি" বাটনে ক্লিক করে দেখুন)');
     }
   }
 
@@ -3202,10 +3213,9 @@ window.BILINGUAL_SYNONYMS = {"electricity": ["ইলেকট্রিসিট�
       return a.chapter_num - b.chapter_num;
     });
 
-    // If current chapterKey doesn't belong to selected trade, select first chapter or 'all'
     const validKeys = new Set(chapters.map(c => c.key));
     if (qbState.chapterKey !== 'all' && !validKeys.has(qbState.chapterKey)) {
-      qbState.chapterKey = chapters.length > 0 ? chapters[0].key : 'all';
+      qbState.chapterKey = 'all';
     }
 
     let html = `<option class="bg-slate-900 text-white" value="all" ${qbState.chapterKey === 'all' ? 'selected' : ''}>সকল অধ্যায় (${toBnNum(pool.length)}টি প্রশ্ন)</option>`;
@@ -3233,22 +3243,21 @@ window.BILINGUAL_SYNONYMS = {"electricity": ["ইলেকট্রিসিট�
     });
   }
 
-  // Smart Auto-Generation of Exam Question Paper
+  // Smart Auto-Generation of Exam Question Paper (Follows Trade-3.pdf 20 + 12 + 6 = 38 pattern for 60 marks)
   function autoGenerateExamPaper(appendMode = false) {
     syncQbInputsToState();
     qbState.generationSeed++;
 
-    const targetMarks = Math.max(1, parseInt(qbState.targetMarks, 10) || 10);
+    const targetMarks = Math.max(1, parseInt(qbState.targetMarks, 10) || 60);
     const existingIds = new Set(appendMode ? qbState.items.map(i => i.sourceId) : []);
 
-    // Helper to pick questions from a pool up to `marksBudget`
-    function pickQuestionsForBudget(pool, unitMark, marksBudget) {
-      // Sort candidates by importance_score + starred + slight rotation so repeated clicks give smart variety
+    // Helper to pick `count` questions from a pool, sorted by importance, then ordered sequentially by chapter (1 -> 4) like Trade-3.pdf
+    function pickQuestionsByCount(pool, unitMark, countNeeded) {
       const available = pool.filter(q => !existingIds.has(q.id));
       const scored = available.map((q, idx) => {
         const starBonus = state.starredIds.has(q.id) ? 80 : 0;
-        const boardBonus = (q.board_years && q.board_years.length > 0) ? 45 : 0;
-        const cycleOffset = ((idx + qbState.generationSeed * 3) % 7) * 6;
+        const boardBonus = (q.board_years && q.board_years.length > 0) ? 50 : 0;
+        const cycleOffset = ((idx + qbState.generationSeed * 3) % 7) * 5;
         return {
           q,
           rankScore: (q.importance_score || 0) + starBonus + boardBonus + cycleOffset
@@ -3256,16 +3265,14 @@ window.BILINGUAL_SYNONYMS = {"electricity": ["ইলেকট্রিসিট�
       });
       scored.sort((a, b) => b.rankScore - a.rankScore);
 
-      const picked = [];
-      let remaining = marksBudget;
-      for (const entry of scored) {
-        if (remaining <= 0) break;
-        const m = remaining >= unitMark ? unitMark : remaining;
-        picked.push(createPaperItemFromQuestion(entry.q, m));
-        existingIds.add(entry.q.id);
-        remaining -= m;
-      }
-      return picked;
+      const selected = scored.slice(0, countNeeded).map(entry => entry.q);
+      // Sort selected questions chapter-wise (Chapter 1 -> 2 -> 3 -> 4) just like Trade-3.pdf
+      selected.sort((a, b) => (a.chapter_num || 1) - (b.chapter_num || 1) || (a.q_no || 0) - (b.q_no || 0));
+
+      return selected.map(q => {
+        existingIds.add(q.id);
+        return createPaperItemFromQuestion(q, unitMark);
+      });
     }
 
     let generatedItems = [];
@@ -3276,38 +3283,41 @@ window.BILINGUAL_SYNONYMS = {"electricity": ["ইলেকট্রিসিট�
       const bPool = getQbCandidatePool('broad');
 
       if (targetMarks === 60) {
-        // Authentic BTEB (বাকাশিবো) 60-Mark Board Exam Structure:
-        // ক-বিভাগ: ১৫টি অতি সংক্ষিপ্ত (যেকোনো ১২টির উত্তর: ১×১২=১২)
-        // খ-বিভাগ: ১৬টি সংক্ষিপ্ত (যেকোনো ১২টির উত্তর: ২×১২=২৪)
-        // গ-বিভাগ: ৭টি রচনামূলক (যেকোনো ৪টির উত্তর: ৬×৪=২৪)
+        // Exact Trade-3.pdf Test Exam-2026 Pattern (60 Marks):
+        // ক-বিভাগ (মান: ১ x ২০ = ২০) -> 20 very_short questions (all mandatory)
+        // খ-বিভাগ (মান: ২ x ১০ = ২০) -> 12 short questions (any 10 mandatory)
+        // গ-বিভাগ (মান: ৪ x ৫ = ২০) -> 6 broad questions (any 5 mandatory)
         generatedItems = [
-          ...pickQuestionsForBudget(vsPool, 1, 15),
-          ...pickQuestionsForBudget(sPool, 2, 32),
-          ...pickQuestionsForBudget(bPool, 6, 42)
+          ...pickQuestionsByCount(vsPool, 1, 20),
+          ...pickQuestionsByCount(sPool, 2, 12),
+          ...pickQuestionsByCount(bPool, 4, 6)
         ];
-        qbState.instruction = `[দ্রষ্টব্য: ডান পাশের সংখ্যা প্রশ্নের পূর্ণমান জ্ঞাপক। ক-বিভাগ হতে যেকোনো ১২টি (১×১২=১২), খ-বিভাগ হতে যেকোনো ১২টি (২×১২=২৪) এবং গ-বিভাগ হতে যেকোনো ৪টি (৬×৪=২৪) প্রশ্নের উত্তর দাও।]`;
+        qbState.instruction = `[দ্রষ্টব্য: ক-বিভাগের সকল, খ-বিভাগের যে কোন ১০টি এবং গ-বিভাগের যে কোন ৫টি প্রশ্নের উত্তর দাও]`;
+        qbState.examTime = '৩ ঘন্টা';
       } else {
-        // Split marks across অতি সংক্ষিপ্ত (1), সংক্ষিপ্ত (2), রচনামূলক (4)
-        const vsBudget = Math.max(2, Math.round(targetMarks * 0.33));
-        const sBudget = Math.max(2, Math.round(targetMarks * 0.33));
-        const bBudget = Math.max(0, targetMarks - vsBudget - sBudget);
+        // Proportional split for other mark totals (e.g. 30, 20, 10)
+        const vsCount = Math.max(2, Math.round((targetMarks * 0.34) / 1));
+        const sCount = Math.max(2, Math.round((targetMarks * 0.33) / 2));
+        const remMarks = Math.max(0, targetMarks - vsCount * 1 - sCount * 2);
+        const bCount = Math.max(0, Math.round(remMarks / 4));
 
         generatedItems = [
-          ...pickQuestionsForBudget(vsPool, 1, vsBudget),
-          ...pickQuestionsForBudget(sPool, 2, sBudget),
-          ...(bBudget > 0 ? pickQuestionsForBudget(bPool, 4, bBudget) : [])
+          ...pickQuestionsByCount(vsPool, 1, vsCount),
+          ...pickQuestionsByCount(sPool, 2, sCount),
+          ...(bCount > 0 ? pickQuestionsByCount(bPool, 4, bCount) : [])
         ];
         qbState.instruction = `[দ্রষ্টব্য: ডান পাশের সংখ্যা প্রশ্নের পূর্ণমান জ্ঞাপক। সকল প্রশ্নের উত্তর দাও।]`;
       }
     } else {
       const pool = getQbCandidatePool(qbState.qType);
       const unitMark = qbState.qType === 'all' ? 2 : getDefaultMarkForType(qbState.qType);
-      generatedItems = pickQuestionsForBudget(pool, unitMark, targetMarks);
+      const countNeeded = Math.max(1, Math.ceil(targetMarks / unitMark));
+      generatedItems = pickQuestionsByCount(pool, unitMark, countNeeded);
 
       const count = generatedItems.length;
       if (count > 0) {
         const typeLabel = TYPE_META[qbState.qType]?.fullLabel || 'প্রশ্নোত্তর';
-        qbState.instruction = `[দ্রষ্টব্য: ডান পাশের সংখ্যা প্রশ্নের পূর্ণমান জ্ঞাপক। সকল প্রশ্নের উত্তর দাও। (${typeLabel}: ${toBnNum(unitMark)}×${toBnNum(count)}=${toBnNum(targetMarks)})]`;
+        qbState.instruction = `[দ্রষ্টব্য: সকল প্রশ্নের উত্তর দাও। (${typeLabel}: ${toBnNum(unitMark)} x ${toBnNum(count)} = ${toBnNum(unitMark * count)})]`;
       }
     }
 
@@ -3324,9 +3334,11 @@ window.BILINGUAL_SYNONYMS = {"electricity": ["ইলেকট্রিসিট�
       showToast(`সফলভাবে ${toBnNum(generatedItems.length)}টি প্রশ্নের (${toBnNum(targetMarks)} নম্বর) প্রশ্নপত্র তৈরি হয়েছে!`);
     }
 
-    const instInput = document.getElementById('qb-instruction-input');
-    if (instInput) instInput.value = qbState.instruction;
+    if (!qbState.customSubjectEdited) {
+      qbState.subjectLine = getDefaultSubjectLineForTrade(qbState.tradeId, qbState.chapterKey);
+    }
 
+    syncStateToQbHeaderInputs();
     saveQbStateToStorage();
     renderQbAll();
     renderAll();
@@ -3337,24 +3349,46 @@ window.BILINGUAL_SYNONYMS = {"electricity": ["ইলেকট্রিসিট�
     const chEl = document.getElementById('qb-chapter-select');
     const typeEl = document.getElementById('qb-type-select');
     const marksEl = document.getElementById('qb-total-marks-input');
-    const examNameEl = document.getElementById('qb-exam-name-input');
-    const timeEl = document.getElementById('qb-exam-time-input');
     const instNameEl = document.getElementById('qb-institution-input');
+    const examNameEl = document.getElementById('qb-exam-name-input');
+    const subjLineEl = document.getElementById('qb-subject-line-input');
+    const timeEl = document.getElementById('qb-exam-time-input');
     const instrEl = document.getElementById('qb-instruction-input');
     const showBoardEl = document.getElementById('qb-show-board-tags');
 
     if (tradeEl) qbState.tradeId = tradeEl.value;
     if (chEl) qbState.chapterKey = chEl.value;
     if (typeEl) qbState.qType = typeEl.value;
-    if (marksEl) qbState.targetMarks = parseInt(marksEl.value, 10) || 10;
-    if (examNameEl) qbState.examName = examNameEl.value.trim() || 'শ্রেণি অভীক্ষা - ২০২৬';
-    if (timeEl) qbState.examTime = timeEl.value.trim() || '৩০ মিনিট';
-    if (instNameEl) qbState.institution = instNameEl.value.trim() || 'বাংলাদেশ কারিগরি শিক্ষা বোর্ড / ভোকেশনাল ইনস্টিটিউট';
+    if (marksEl) qbState.targetMarks = parseInt(marksEl.value, 10) || 60;
+    if (instNameEl) qbState.institution = instNameEl.value.trim() || 'সফির উদ্দিন হাই স্কুল এন্ড কলেজ';
+    if (examNameEl) qbState.examName = examNameEl.value.trim() || 'দশম (ভোকেশনাল) শ্রেণি টেস্ট পরীক্ষা-২০২৬';
+    if (subjLineEl) qbState.subjectLine = subjLineEl.value.trim() || getDefaultSubjectLineForTrade(qbState.tradeId, qbState.chapterKey);
+    if (timeEl) qbState.examTime = timeEl.value.trim() || '৩ ঘন্টা';
     if (instrEl) qbState.instruction = instrEl.value.trim();
     if (showBoardEl) qbState.showBoardTags = showBoardEl.checked;
   }
 
-  // Render Left Pane: Suggested Draggable Question Pool
+  function syncStateToQbHeaderInputs() {
+    const instNameEl = document.getElementById('qb-institution-input');
+    const examNameEl = document.getElementById('qb-exam-name-input');
+    const subjLineEl = document.getElementById('qb-subject-line-input');
+    const timeEl = document.getElementById('qb-exam-time-input');
+    const instrEl = document.getElementById('qb-instruction-input');
+    const trEl = document.getElementById('qb-trade-select');
+    const tpEl = document.getElementById('qb-type-select');
+    const mkEl = document.getElementById('qb-total-marks-input');
+
+    if (instNameEl && document.activeElement !== instNameEl) instNameEl.value = qbState.institution;
+    if (examNameEl && document.activeElement !== examNameEl) examNameEl.value = qbState.examName;
+    if (subjLineEl && document.activeElement !== subjLineEl) subjLineEl.value = qbState.subjectLine;
+    if (timeEl && document.activeElement !== timeEl) timeEl.value = qbState.examTime;
+    if (instrEl && document.activeElement !== instrEl) instrEl.value = qbState.instruction;
+    if (trEl && document.activeElement !== trEl) trEl.value = qbState.tradeId;
+    if (tpEl && document.activeElement !== tpEl) tpEl.value = qbState.qType;
+    if (mkEl && document.activeElement !== mkEl) mkEl.value = qbState.targetMarks;
+  }
+
+  // Render Left Pane: Suggested Question Pool (Simple Click / Double-Click on Alternate, Zero Drag Hang)
   function renderQbPool() {
     const listEl = document.getElementById('qb-pool-list');
     const countBadge = document.getElementById('qb-pool-count-badge');
@@ -3363,7 +3397,6 @@ window.BILINGUAL_SYNONYMS = {"electricity": ["ইলেকট্রিসিট�
 
     let candidates = getQbCandidatePool();
 
-    // Filter by priority dropdown
     if (qbState.poolPriority === 'top') {
       candidates = candidates.filter(q => q.importance_tier === 'top');
     } else if (qbState.poolPriority === 'board') {
@@ -3374,13 +3407,11 @@ window.BILINGUAL_SYNONYMS = {"electricity": ["ইলেকট্রিসিট�
       candidates = candidates.filter(q => state.starredIds.has(q.id));
     }
 
-    // Filter by pool search query
     const expandedSearch = getExpandedSearchTerms(qbState.poolSearch);
     if (expandedSearch.length > 0) {
       candidates = candidates.filter(q => matchesSearch(q, expandedSearch));
     }
 
-    // Sort pool: top important & board questions first
     candidates.sort((a, b) => (b.importance_score || 0) - (a.importance_score || 0));
 
     if (countBadge) countBadge.textContent = `${toBnNum(candidates.length)}টি প্রশ্ন`;
@@ -3401,23 +3432,26 @@ window.BILINGUAL_SYNONYMS = {"electricity": ["ইলেকট্রিসিট�
       const defaultMark = getDefaultMarkForType(q.base_type);
       const hasBoard = q.board_years && q.board_years.length > 0;
       const isTop = q.importance_tier === 'top';
+      const alts = q.alternatives || [];
 
       return `
         <div
-          draggable="true"
           data-pool-qid="${q.id}"
-          class="qb-pool-card cursor-grab active:cursor-grabbing bg-white dark:bg-slate-800/95 rounded-xl p-3 border ${
+          class="qb-pool-card bg-white dark:bg-slate-800/95 rounded-xl p-3 border ${
             inPaper
               ? 'border-emerald-500/60 bg-emerald-50/20 dark:bg-emerald-950/20'
               : isTop
               ? 'border-rose-500/40 hover:border-indigo-500'
               : 'border-slate-200 dark:border-slate-700 hover:border-indigo-500'
-          } shadow-2xs transition-all select-none"
+          } shadow-2xs transition-all"
         >
           <div class="flex items-center justify-between gap-1.5 mb-1.5">
             <div class="flex flex-wrap items-center gap-1">
               <span class="text-[11px] font-bold px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
-                <i class="fa-solid fa-grip-vertical text-slate-400 mr-1"></i>${escapeHtml(tMeta.label)} (${toBnNum(defaultMark)})
+                ${escapeHtml(tMeta.label)} (${toBnNum(defaultMark)})
+              </span>
+              <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-700/70 text-slate-500 dark:text-slate-400">
+                অধ্যায়-${toBnNum(q.chapter_num || 1)}
               </span>
               ${
                 isTop
@@ -3438,30 +3472,45 @@ window.BILINGUAL_SYNONYMS = {"electricity": ["ইলেকট্রিসিট�
               }
               <button
                 type="button"
-                data-pool-add-alt="${q.id}"
-                class="pool-add-alt-btn px-2 py-0.5 rounded-lg text-[11px] font-bold bg-purple-500/15 hover:bg-purple-500/30 text-purple-400 border border-purple-500/30 transition-colors"
-                title="সর্বশেষ প্রশ্নের ‘অথবা’ (বিকল্প প্রশ্ন) হিসেবে যুক্ত করুন"
-              >
-                +অথবা
-              </button>
-              <button
-                type="button"
                 data-pool-add="${q.id}"
-                class="pool-add-btn px-2.5 py-0.5 rounded-lg text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white shadow-2xs transition-colors"
-                title="প্রশ্নপত্রে যোগ করুন"
+                class="pool-add-btn px-2.5 py-1 rounded-lg text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white shadow-2xs transition-colors"
+                title="মূল প্রশ্নটি একক প্রশ্ন হিসেবে যোগ করুন"
               >
                 <i class="fa-solid fa-plus mr-0.5"></i>যোগ
               </button>
             </div>
           </div>
 
-          <div class="text-sm sm:text-[15px] font-semibold text-slate-800 dark:text-slate-100 leading-snug">
+          <!-- Main Question (Double-click also places it as single question) -->
+          <div
+            data-dbl-main="${q.id}"
+            class="pool-main-q cursor-pointer text-sm sm:text-[15px] font-semibold text-slate-800 dark:text-slate-100 hover:text-indigo-500 dark:hover:text-indigo-400 leading-snug py-0.5"
+            title="ডাবল-ক্লিক করলে মূল প্রশ্নটি একক প্রশ্ন হিসেবে যুক্ত হবে"
+          >
             ${escapeHtml(q.question)}
           </div>
+
+          <!-- Alternate (অথবা) Questions: Double-click any Alternate to place it as a SINGLE question! -->
           ${
-            q.alternatives && q.alternatives.length > 0
-              ? `<div class="mt-1 text-xs text-slate-500 dark:text-slate-400 truncate">
-                  <strong class="text-indigo-400">অথবা:</strong> ${escapeHtml(q.alternatives[0].text)}
+            alts.length > 0
+              ? `<div class="mt-2 pt-1.5 border-t border-slate-200/70 dark:border-slate-700/70 space-y-1">
+                  <div class="text-[10px] font-bold text-amber-500 flex items-center gap-1">
+                    <i class="fa-solid fa-angles-right"></i>
+                    <span>বিকল্প প্রশ্ন (ডাবল-ক্লিক করলে একক প্রশ্ন হিসেবে প্রশ্নপত্রে বসবে):</span>
+                  </div>
+                  ${alts.map((alt, aIdx) => `
+                    <div
+                      data-dbl-alt-qid="${q.id}"
+                      data-dbl-alt-idx="${aIdx}"
+                      class="pool-alt-q cursor-pointer group flex items-center justify-between gap-2 px-2 py-1 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/25 text-xs sm:text-[13px] font-medium text-slate-700 dark:text-slate-200 transition-colors select-none"
+                      title="এই বিকল্প প্রশ্নটিতে ডাবল-ক্লিক করলে এটি একক প্রশ্ন হিসেবে প্রশ্নপত্রে যুক্ত হবে"
+                    >
+                      <span class="truncate"><strong class="text-indigo-400 mr-1">অথবা:</strong>${escapeHtml(alt.text)}</span>
+                      <span class="shrink-0 text-[10px] font-bold px-1.5 py-0.5 rounded bg-indigo-600 text-white opacity-80 group-hover:opacity-100">
+                        ডাবল-ক্লিক / +
+                      </span>
+                    </div>
+                  `).join('')}
                 </div>`
               : ''
           }
@@ -3469,78 +3518,70 @@ window.BILINGUAL_SYNONYMS = {"electricity": ["ইলেকট্রিসিট�
       `;
     }).join('');
 
-    // Bind Pool Card Drag & Click Events
-    listEl.querySelectorAll('.qb-pool-card').forEach(card => {
-      card.addEventListener('dragstart', (e) => {
-        const qid = card.getAttribute('data-pool-qid');
-        e.dataTransfer.setData('text/plain', JSON.stringify({ type: 'pool-question', qid }));
-        e.dataTransfer.effectAllowed = 'copy';
-        card.classList.add('qb-item-dragging');
-      });
-      card.addEventListener('dragend', () => {
-        card.classList.remove('qb-item-dragging');
-      });
-    });
-
+    // 1. Click '+ যোগ' button -> add main question as single question
     listEl.querySelectorAll('.pool-add-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
         const qid = btn.getAttribute('data-pool-add');
         const q = state.questions.find(item => item.id === qid);
         if (!q) return;
-        qbState.items.push(createPaperItemFromQuestion(q));
-        saveQbStateToStorage();
-        renderQbAll();
-        renderAll();
-        showToast('প্রশ্নপত্রে প্রশ্নটি যোগ করা হয়েছে!');
+        addOrReplaceSingleQuestion(q, q.question);
       });
     });
 
-    listEl.querySelectorAll('.pool-add-alt-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
+    // 2. Double-click on Main Question -> add/replace as single question
+    listEl.querySelectorAll('.pool-main-q').forEach(el => {
+      el.addEventListener('dblclick', (e) => {
         e.stopPropagation();
-        const qid = btn.getAttribute('data-pool-add-alt');
+        const qid = el.getAttribute('data-dbl-main');
         const q = state.questions.find(item => item.id === qid);
         if (!q) return;
-        if (qbState.items.length === 0) {
-          qbState.items.push(createPaperItemFromQuestion(q));
-          showToast('প্রশ্নপত্রে প্রথম প্রশ্ন হিসেবে যোগ করা হয়েছে');
-        } else {
-          const lastItem = qbState.items[qbState.items.length - 1];
-          lastItem.altQuestion = q.question;
-          showToast(`প্রশ্ন ${toBnNum(qbState.items.length)}-এর ‘অথবা’ হিসেবে যুক্ত করা হয়েছে!`);
-        }
-        saveQbStateToStorage();
-        renderQbAll();
+        addOrReplaceSingleQuestion(q, q.question);
       });
+    });
+
+    // 3. Double-click (or click badge) on Alternate (`অথবা`) Question -> places Alternate as a SINGLE standalone question!
+    listEl.querySelectorAll('.pool-alt-q').forEach(el => {
+      const handleSelectAlt = (e) => {
+        e.stopPropagation();
+        const qid = el.getAttribute('data-dbl-alt-qid');
+        const aIdx = parseInt(el.getAttribute('data-dbl-alt-idx'), 10);
+        const q = state.questions.find(item => item.id === qid);
+        if (!q || !q.alternatives || !q.alternatives[aIdx]) return;
+        addOrReplaceSingleQuestion(q, q.alternatives[aIdx].text);
+      };
+      el.addEventListener('dblclick', handleSelectAlt);
+      el.addEventListener('click', handleSelectAlt);
     });
   }
 
-  // Helper: Compute effective paper marks (handles BTEB 60-mark optional choice structure)
+  // Helper: Compute effective paper marks (handles Trade-3.pdf 60-mark Test Exam structure: 20 + 20 + 20 = 60)
   function getEffectivePaperMarks() {
     const rawSum = qbState.items.reduce((sum, item) => sum + (Number(item.marks) || 0), 0);
-    if (qbState.qType === 'mixed_board' && Number(qbState.targetMarks) === 60 && qbState.items.length >= 28) {
+    if (qbState.qType === 'mixed_board' && Number(qbState.targetMarks) === 60 && qbState.items.length >= 25) {
       return 60;
     }
     return rawSum;
   }
 
+  // Exact Section Headings following Trade-3.pdf
   function getSectionHeaderForMixedBoard(baseType) {
-    const isBteb60 = Number(qbState.targetMarks) === 60;
+    const vsCount = qbState.items.filter(i => i.base_type === 'very_short').length;
+    const sCount = qbState.items.filter(i => i.base_type === 'short').length;
+    const bCount = qbState.items.filter(i => i.base_type === 'broad').length;
+    const isTest60 = Number(qbState.targetMarks) === 60;
+
     if (baseType === 'very_short') {
-      return isBteb60
-        ? 'ক-বিভাগ: অতি সংক্ষিপ্ত প্রশ্ন (যেকোনো ১২টি প্রশ্নের উত্তর দাও: ১ × ১২ = ১২)'
-        : 'ক-বিভাগ: অতি সংক্ষিপ্ত প্রশ্ন';
+      const c = isTest60 ? 20 : vsCount;
+      return `ক-বিভাগ (মান: ১ x ${toBnNum(c)} = ${toBnNum(c)})`;
     }
     if (baseType === 'short') {
-      return isBteb60
-        ? 'খ-বিভাগ: সংক্ষিপ্ত প্রশ্ন (যেকোনো ১২টি প্রশ্নের উত্তর দাও: ২ × ১২ = ২৪)'
-        : 'খ-বিভাগ: সংক্ষিপ্ত প্রশ্ন';
+      const ansCount = isTest60 ? 10 : sCount;
+      return `খ-বিভাগ (মান: ২ x ${toBnNum(ansCount)} = ${toBnNum(ansCount * 2)})`;
     }
     if (baseType === 'broad') {
-      return isBteb60
-        ? 'গ-বিভাগ: রচনামূলক প্রশ্ন (যেকোনো ৪টি প্রশ্নের উত্তর দাও: ৬ × ৪ = ২৪)'
-        : 'গ-বিভাগ: রচনামূলক প্রশ্ন';
+      const ansCount = isTest60 ? 5 : bCount;
+      return `গ-বিভাগ (মান: ৪ x ${toBnNum(ansCount)} = ${toBnNum(ansCount * 4)})`;
     }
     return '';
   }
@@ -3549,12 +3590,7 @@ window.BILINGUAL_SYNONYMS = {"electricity": ["ইলেকট্রিসিট�
   function renderQbPaper() {
     syncQbInputsToState();
 
-    // Update Paper Header Titles
-    const titleEl = document.getElementById('qb-paper-exam-title');
-    const subjEl = document.getElementById('qb-paper-subject-line');
-    const timeEl = document.getElementById('qb-paper-time-display');
     const marksEl = document.getElementById('qb-paper-marks-display');
-
     const statQCount = document.getElementById('qb-stat-qcount');
     const statTargetMarks = document.getElementById('qb-stat-target-marks');
     const statCurrentMarks = document.getElementById('qb-stat-current-marks');
@@ -3562,30 +3598,13 @@ window.BILINGUAL_SYNONYMS = {"electricity": ["ইলেকট্রিসিট�
 
     const totalCurrentMarks = getEffectivePaperMarks();
 
-    if (titleEl) titleEl.textContent = qbState.examName;
-
-    const tradeMeta = TRADES_META[qbState.tradeId] || TRADES_META['trade-3'];
-    const chLabel = qbState.chapterKey === 'all'
-      ? 'সকল অধ্যায়'
-      : (qbState.chapterKey.includes('::') ? qbState.chapterKey.split('::')[1] : qbState.chapterKey);
-    const codeMap = {
-      'trade-1': 'বিষয় কোড: ৮৮২১/৫৮৮২১',
-      'trade-2': 'বিষয় কোড: ৮৮২২/৫৮৮২২',
-      'trade-3': 'বিষয় কোড: ৮৮২৩/৫৮৮২৩',
-      'trade-4': 'বিষয় কোড: ৮৮২৪/৫৮৮২৪'
-    };
-    const codeStr = codeMap[qbState.tradeId] ? ` (${codeMap[qbState.tradeId]})` : '';
-    if (subjEl) {
-      subjEl.textContent = `বিষয়: ${tradeMeta.title}${codeStr} • ${chLabel}`;
-    }
-
-    if (timeEl) timeEl.textContent = qbState.examTime;
     if (marksEl) marksEl.textContent = toBnNum(totalCurrentMarks || qbState.targetMarks);
-
     if (statQCount) statQCount.textContent = toBnNum(qbState.items.length);
     if (statTargetMarks) statTargetMarks.textContent = toBnNum(qbState.targetMarks);
     if (statCurrentMarks) statCurrentMarks.textContent = toBnNum(totalCurrentMarks);
     if (mobilePaperCount) mobilePaperCount.textContent = toBnNum(qbState.items.length);
+
+    syncStateToQbHeaderInputs();
 
     const dropzone = document.getElementById('qb-paper-dropzone');
     if (!dropzone) return;
@@ -3594,13 +3613,13 @@ window.BILINGUAL_SYNONYMS = {"electricity": ["ইলেকট্রিসিট�
       dropzone.innerHTML = `
         <div class="border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-2xl p-8 sm:p-10 text-center my-4">
           <div class="w-12 h-12 rounded-2xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center mx-auto mb-3 text-xl">
-            <i class="fa-solid fa-arrows-up-down-left-right"></i>
+            <i class="fa-solid fa-file-circle-Check"></i>
           </div>
           <h4 class="text-base font-bold text-slate-800 dark:text-slate-200 mb-1">
             প্রশ্নপত্র বর্তমানে খালি আছে
           </h4>
           <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 max-w-md mx-auto mb-4">
-            উপরের বার থেকে <strong>ট্রেড &gt; অধ্যায় &gt; প্রশ্নের ধরন &gt; পূর্ণমান</strong> নির্বাচন করে <strong>“প্রশ্ন তৈরি করুন”</strong> বাটনে ক্লিক করুন, অথবা বাম পাশের সাজেশন পুল থেকে যেকোনো প্রশ্ন টেনে (Drag &amp; Drop) এখানে ছেড়ে দিন।
+            উপরের বার থেকে <strong>“প্রশ্ন তৈরি করুন”</strong> বা <strong>“ট্রেড-৪ (৬০ নম্বর) কমন সেট”</strong> বাটনে ক্লিক করুন, অথবা বাম পাশের সাজেশন পুল থেকে যেকোনো প্রশ্নে ক্লিক/ডাবল-ক্লিক করে যোগ করুন।
           </p>
           <button
             type="button"
@@ -3608,7 +3627,7 @@ window.BILINGUAL_SYNONYMS = {"electricity": ["ইলেকট্রিসিট�
             class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs sm:text-sm font-bold shadow-md"
           >
             <i class="fa-solid fa-wand-magic-sparkles"></i>
-            <span>এখনই স্বয়ংক্রিয় প্রশ্নপত্র তৈরি করুন</span>
+            <span>এখনই ৬০ নম্বরের টেস্ট প্রশ্নপত্র তৈরি করুন</span>
           </button>
         </div>
       `;
@@ -3624,9 +3643,8 @@ window.BILINGUAL_SYNONYMS = {"electricity": ["ইলেকট্রিসিট�
       const showSecBanner = qbState.qType === 'mixed_board' && item.base_type !== prevType;
       const secBannerTitle = showSecBanner ? getSectionHeaderForMixedBoard(item.base_type) : '';
       const secBannerHtml = secBannerTitle
-        ? `<div class="mt-3 mb-1.5 px-3.5 py-2 rounded-xl bg-indigo-500/10 dark:bg-indigo-950/60 border border-indigo-500/30 text-xs sm:text-sm font-extrabold text-indigo-700 dark:text-indigo-300 flex items-center gap-2">
-            <i class="fa-solid fa-layer-group"></i>
-            <span>${escapeHtml(secBannerTitle)}</span>
+        ? `<div class="mt-4 mb-2 py-1.5 text-center font-extrabold text-sm sm:text-base text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-800/90 rounded-xl border border-slate-300 dark:border-slate-700">
+            ${escapeHtml(secBannerTitle)}
           </div>`
         : '';
 
@@ -3634,6 +3652,20 @@ window.BILINGUAL_SYNONYMS = {"electricity": ["ইলেকট্রিসিট�
       const boardTagHtml = (qbState.showBoardTags && item.board_years && item.board_years.length > 0)
         ? `<span class="text-xs font-semibold text-emerald-600 dark:text-emerald-400 ml-1">[${formatBoardYearsText(item.board_years)}]</span>`
         : '';
+
+      // Find if source question has alternate variants so user can double-click to swap as a single question
+      const sourceQ = item.sourceId ? state.questions.find(q => q.id === item.sourceId) : null;
+      const variantOptions = [];
+      if (sourceQ) {
+        if (sourceQ.question !== item.question) {
+          variantOptions.push(sourceQ.question);
+        }
+        (sourceQ.alternatives || []).forEach(alt => {
+          if (alt.text && alt.text !== item.question) {
+            variantOptions.push(alt.text);
+          }
+        });
+      }
 
       if (isEditing) {
         return `
@@ -3645,7 +3677,7 @@ window.BILINGUAL_SYNONYMS = {"electricity": ["ইলেকট্রিসিট�
           >
             <div class="flex items-center justify-between gap-2">
               <span class="text-xs font-extrabold text-indigo-600 dark:text-indigo-400">
-                প্রশ্ন ${toBnNum(idx + 1)} মডিফাই / এডিট করুন
+                প্রশ্ন ${toBnNum(idx + 1)} এডিট করুন
               </span>
               <div class="flex items-center gap-1.5">
                 <label class="text-xs font-bold text-slate-600 dark:text-slate-300">মান:</label>
@@ -3660,22 +3692,11 @@ window.BILINGUAL_SYNONYMS = {"electricity": ["ইলেকট্রিসিট�
               </div>
             </div>
             <div>
-              <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">মূল প্রশ্ন:</label>
               <textarea
                 id="qb-edit-q-${item.uid}"
                 rows="2"
                 class="w-full p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-sm sm:text-base font-semibold text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500"
               >${escapeHtml(item.question)}</textarea>
-            </div>
-            <div>
-              <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">বিকল্প প্রশ্ন (‘অথবা’ - ঐচ্ছিক):</label>
-              <input
-                type="text"
-                id="qb-edit-alt-${item.uid}"
-                value="${escapeHtml(item.altQuestion || '')}"
-                placeholder="যদি ‘অথবা’ প্রশ্ন দিতে চান তবে এখানে লিখুন..."
-                class="w-full p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-xs sm:text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:border-indigo-500"
-              />
             </div>
             <div class="flex items-center justify-end gap-2 pt-1">
               <button
@@ -3700,112 +3721,78 @@ window.BILINGUAL_SYNONYMS = {"electricity": ["ইলেকট্রিসিট�
       return `
         ${secBannerHtml}
         <div
-          draggable="true"
           data-paper-uid="${item.uid}"
           data-paper-idx="${idx}"
-          class="qb-paper-item group relative bg-slate-50/80 dark:bg-slate-800/70 hover:bg-white dark:hover:bg-slate-800 rounded-xl p-3 sm:p-3.5 border border-slate-200/90 dark:border-slate-700/80 hover:border-indigo-400 dark:hover:border-indigo-500/70 transition-all"
+          class="qb-paper-item group relative bg-slate-50/70 dark:bg-slate-800/60 hover:bg-white dark:hover:bg-slate-800 rounded-xl px-3 py-2.5 border border-slate-200/80 dark:border-slate-700/70 hover:border-indigo-400 dark:hover:border-indigo-500/70 transition-all"
         >
           <div class="flex items-start justify-between gap-3">
-            <!-- Left Drag Handle & Question Number + Text -->
-            <div class="flex items-start gap-2.5 min-w-0 flex-1">
-              <span
-                class="cursor-grab active:cursor-grabbing text-slate-400 hover:text-indigo-500 mt-1 shrink-0"
-                title="ড্র্যাগ করে প্রশ্নের ক্রম পরিবর্তন করুন"
-              >
-                <i class="fa-solid fa-grip-vertical text-sm"></i>
-              </span>
-              <div class="min-w-0 flex-1">
-                <div class="text-base sm:text-[18px] font-bold text-slate-900 dark:text-slate-100 leading-relaxed">
-                  <span class="text-indigo-600 dark:text-indigo-400 mr-1">${toBnNum(idx + 1)}।</span>
-                  <span data-edit-trigger="${item.uid}" class="qb-edit-item-btn cursor-pointer hover:underline decoration-dashed" title="ক্লিক করে প্রশ্নটি এডিট করুন">${escapeHtml(item.question)}</span>
-                  ${boardTagHtml}
-                </div>
-                ${
-                  item.altQuestion
-                    ? `<div class="mt-1.5 pl-3 border-l-2 border-indigo-400 dark:border-indigo-500 flex items-center justify-between gap-2 bg-indigo-500/5 py-1 px-2 rounded-r-lg">
-                        <div class="text-sm sm:text-base font-medium text-slate-700 dark:text-slate-200">
-                          <strong class="text-indigo-600 dark:text-indigo-400 mr-1">অথবা,</strong>
-                          <span>${escapeHtml(item.altQuestion)}</span>
-                        </div>
-                        <button
-                          type="button"
-                          data-remove-alt="${item.uid}"
-                          class="qb-remove-alt-btn text-xs text-slate-400 hover:text-rose-500 px-1"
-                          title="‘অথবা’ প্রশ্নটি সরান"
-                        >
-                          <i class="fa-solid fa-xmark"></i>
-                        </button>
-                      </div>`
-                    : ''
-                }
-                <!-- Drop-as-Alt target hint when dragging -->
-                <div
-                  data-drop-alt-idx="${idx}"
-                  class="qb-alt-dropzone hidden mt-2 py-1 px-2.5 rounded-lg border border-dashed border-purple-400 bg-purple-500/10 text-[11px] font-bold text-purple-400 text-center"
-                >
-                  + এই প্রশ্নের ‘অথবা’ (বিকল্প প্রশ্ন) হিসেবে যুক্ত করতে এখানে ছেড়ে দিন
-                </div>
+            <div class="min-w-0 flex-1">
+              <div class="text-base sm:text-[17px] font-semibold text-slate-900 dark:text-slate-100 leading-relaxed">
+                <span class="font-bold mr-1">${toBnNum(idx + 1)}।</span>
+                <span data-edit-trigger="${item.uid}" class="qb-edit-item-btn cursor-pointer hover:underline decoration-dashed" title="ক্লিক করে প্রশ্নটি এডিট করুন">${escapeHtml(item.question)}</span>
+                ${boardTagHtml}
               </div>
+              ${
+                variantOptions.length > 0
+                  ? `<div class="mt-1 flex flex-wrap items-center gap-1.5">
+                      ${variantOptions.map(vText => `
+                        <span
+                          data-swap-variant-uid="${item.uid}"
+                          data-swap-variant-text="${escapeHtml(vText)}"
+                          class="qb-variant-chip cursor-pointer inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/25 text-[11px] font-medium text-indigo-600 dark:text-indigo-300 select-none"
+                          title="ডাবল-ক্লিক করলে এই বিকল্প প্রশ্নটি একক প্রশ্ন হিসেবে বসবে"
+                        >
+                          <i class="fa-solid fa-repeat text-[10px]"></i>
+                          <span>অথবা (ডাবল-ক্লিক): ${escapeHtml(vText)}</span>
+                        </span>
+                      `).join('')}
+                    </div>`
+                  : ''
+              }
             </div>
 
-            <!-- Right Marks Input & Action Controls -->
-            <div class="flex flex-col sm:flex-row items-end sm:items-center gap-2 shrink-0">
-              <!-- Quick Marks Badge / Input -->
-              <div class="flex items-center gap-1 bg-slate-200/80 dark:bg-slate-900 px-2 py-1 rounded-lg border border-slate-300 dark:border-slate-700" title="এই প্রশ্নের নম্বর পরিবর্তন করুন">
-                <span class="text-[11px] text-slate-500 dark:text-slate-400 font-semibold">মান:</span>
-                <input
-                  type="number"
-                  min="1"
-                  max="50"
-                  value="${item.marks}"
-                  data-mark-uid="${item.uid}"
-                  class="qb-inline-mark-input w-10 bg-transparent text-xs sm:text-sm font-extrabold text-center text-slate-900 dark:text-white focus:outline-none"
-                />
-              </div>
-
-              <!-- Action Buttons -->
-              <div class="flex items-center gap-1">
-                <button
-                  type="button"
-                  data-edit-trigger="${item.uid}"
-                  class="qb-edit-item-btn w-7 h-7 rounded-lg bg-slate-200/70 dark:bg-slate-700/70 hover:bg-indigo-600 hover:text-white text-slate-600 dark:text-slate-300 flex items-center justify-center text-xs transition-colors"
-                  title="প্রশ্নটি মডিফাই / এডিট করুন"
-                >
-                  <i class="fa-solid fa-pen-to-square"></i>
-                </button>
-                <button
-                  type="button"
-                  data-swap-uid="${item.uid}"
-                  class="qb-swap-item-btn w-7 h-7 rounded-lg bg-slate-200/70 dark:bg-slate-700/70 hover:bg-amber-500 hover:text-white text-slate-600 dark:text-slate-300 flex items-center justify-center text-xs transition-colors"
-                  title="সাজেশন থেকে অন্য একটি বিকল্প প্রশ্ন দিয়ে এটি বদলান (Swap)"
-                >
-                  <i class="fa-solid fa-arrows-rotate"></i>
-                </button>
-                <button
-                  type="button"
-                  data-move-up="${idx}"
-                  class="qb-move-up-btn w-7 h-7 rounded-lg bg-slate-200/70 dark:bg-slate-700/70 hover:bg-slate-600 hover:text-white text-slate-600 dark:text-slate-300 flex items-center justify-center text-xs transition-colors ${idx === 0 ? 'opacity-30 pointer-events-none' : ''}"
-                  title="উপরে নিন"
-                >
-                  <i class="fa-solid fa-arrow-up"></i>
-                </button>
-                <button
-                  type="button"
-                  data-move-down="${idx}"
-                  class="qb-move-down-btn w-7 h-7 rounded-lg bg-slate-200/70 dark:bg-slate-700/70 hover:bg-slate-600 hover:text-white text-slate-600 dark:text-slate-300 flex items-center justify-center text-xs transition-colors ${idx === qbState.items.length - 1 ? 'opacity-30 pointer-events-none' : ''}"
-                  title="নিচে নামান"
-                >
-                  <i class="fa-solid fa-arrow-down"></i>
-                </button>
-                <button
-                  type="button"
-                  data-delete-uid="${item.uid}"
-                  class="qb-delete-item-btn w-7 h-7 rounded-lg bg-rose-500/10 hover:bg-rose-600 text-rose-500 hover:text-white flex items-center justify-center text-xs transition-colors"
-                  title="প্রশ্নটি মুছে ফেলুন"
-                >
-                  <i class="fa-solid fa-trash-can"></i>
-                </button>
-              </div>
+            <!-- Action Controls -->
+            <div class="flex items-center gap-1 shrink-0 opacity-85 group-hover:opacity-100">
+              <button
+                type="button"
+                data-edit-trigger="${item.uid}"
+                class="qb-edit-item-btn w-7 h-7 rounded-lg bg-slate-200/70 dark:bg-slate-700/70 hover:bg-indigo-600 hover:text-white text-slate-600 dark:text-slate-300 flex items-center justify-center text-xs transition-colors"
+                title="প্রশ্নটি এডিট করুন"
+              >
+                <i class="fa-solid fa-pen-to-square"></i>
+              </button>
+              <button
+                type="button"
+                data-swap-uid="${item.uid}"
+                class="qb-swap-item-btn w-7 h-7 rounded-lg bg-slate-200/70 dark:bg-slate-700/70 hover:bg-amber-500 hover:text-white text-slate-600 dark:text-slate-300 flex items-center justify-center text-xs transition-colors"
+                title="সাজেশন থেকে অন্য একটি প্রশ্ন দিয়ে এটি বদলান"
+              >
+                <i class="fa-solid fa-arrows-rotate"></i>
+              </button>
+              <button
+                type="button"
+                data-move-up="${idx}"
+                class="qb-move-up-btn w-7 h-7 rounded-lg bg-slate-200/70 dark:bg-slate-700/70 hover:bg-slate-600 hover:text-white text-slate-600 dark:text-slate-300 flex items-center justify-center text-xs transition-colors ${idx === 0 ? 'opacity-30 pointer-events-none' : ''}"
+                title="উপরে নিন"
+              >
+                <i class="fa-solid fa-arrow-up"></i>
+              </button>
+              <button
+                type="button"
+                data-move-down="${idx}"
+                class="qb-move-down-btn w-7 h-7 rounded-lg bg-slate-200/70 dark:bg-slate-700/70 hover:bg-slate-600 hover:text-white text-slate-600 dark:text-slate-300 flex items-center justify-center text-xs transition-colors ${idx === qbState.items.length - 1 ? 'opacity-30 pointer-events-none' : ''}"
+                title="নিচে নামান"
+              >
+                <i class="fa-solid fa-arrow-down"></i>
+              </button>
+              <button
+                type="button"
+                data-delete-uid="${item.uid}"
+                class="qb-delete-item-btn w-7 h-7 rounded-lg bg-rose-500/10 hover:bg-rose-600 text-rose-500 hover:text-white flex items-center justify-center text-xs transition-colors"
+                title="প্রশ্নটি মুছে ফেলুন"
+              >
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
             </div>
           </div>
         </div>
@@ -3816,20 +3803,7 @@ window.BILINGUAL_SYNONYMS = {"electricity": ["ইলেকট্রিসিট�
   }
 
   function bindQbPaperEvents(dropzone) {
-    // 1. Inline mark change
-    dropzone.querySelectorAll('.qb-inline-mark-input').forEach(inp => {
-      inp.addEventListener('change', (e) => {
-        const uid = inp.getAttribute('data-mark-uid');
-        const item = qbState.items.find(i => i.uid === uid);
-        if (item) {
-          item.marks = Math.max(1, parseInt(e.target.value, 10) || 1);
-          saveQbStateToStorage();
-          renderQbPaper();
-        }
-      });
-    });
-
-    // 2. Open inline edit
+    // 1. Open inline edit
     dropzone.querySelectorAll('.qb-edit-item-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         qbState.editingItemId = btn.getAttribute('data-edit-trigger');
@@ -3837,7 +3811,7 @@ window.BILINGUAL_SYNONYMS = {"electricity": ["ইলেকট্রিসিট�
       });
     });
 
-    // 3. Cancel inline edit
+    // 2. Cancel inline edit
     dropzone.querySelectorAll('.qb-cancel-edit-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         qbState.editingItemId = null;
@@ -3845,17 +3819,15 @@ window.BILINGUAL_SYNONYMS = {"electricity": ["ইলেকট্রিসিট�
       });
     });
 
-    // 4. Save inline edit
+    // 3. Save inline edit
     dropzone.querySelectorAll('.qb-save-edit-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         const uid = btn.getAttribute('data-save-edit');
         const item = qbState.items.find(i => i.uid === uid);
         if (item) {
           const qVal = document.getElementById(`qb-edit-q-${uid}`)?.value.trim();
-          const altVal = document.getElementById(`qb-edit-alt-${uid}`)?.value.trim();
           const mVal = parseInt(document.getElementById(`qb-edit-marks-${uid}`)?.value, 10);
           if (qVal) item.question = qVal;
-          item.altQuestion = altVal || '';
           if (mVal > 0) item.marks = mVal;
         }
         qbState.editingItemId = null;
@@ -3865,20 +3837,24 @@ window.BILINGUAL_SYNONYMS = {"electricity": ["ইলেকট্রিসিট�
       });
     });
 
-    // 5. Remove `অথবা`
-    dropzone.querySelectorAll('.qb-remove-alt-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const uid = btn.getAttribute('data-remove-alt');
+    // 4. Double-click (or click) on Alternate variant chip inside paper -> replaces question text as single question!
+    dropzone.querySelectorAll('.qb-variant-chip').forEach(chip => {
+      const swapToVariant = () => {
+        const uid = chip.getAttribute('data-swap-variant-uid');
+        const newText = chip.getAttribute('data-swap-variant-text');
         const item = qbState.items.find(i => i.uid === uid);
-        if (item) {
-          item.altQuestion = '';
+        if (item && newText) {
+          item.question = newText;
           saveQbStateToStorage();
           renderQbPaper();
+          showToast('বিকল্প প্রশ্নটি মূল একক প্রশ্ন হিসেবে বসানো হয়েছে!');
         }
-      });
+      };
+      chip.addEventListener('dblclick', swapToVariant);
+      chip.addEventListener('click', swapToVariant);
     });
 
-    // 6. Swap with another suggested question
+    // 5. Swap with another suggested question of the same type
     dropzone.querySelectorAll('.qb-swap-item-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         const uid = btn.getAttribute('data-swap-uid');
@@ -3906,7 +3882,7 @@ window.BILINGUAL_SYNONYMS = {"electricity": ["ইলেকট্রিসিট�
       });
     });
 
-    // 7. Move Up / Move Down / Delete
+    // 6. Move Up / Move Down / Delete
     dropzone.querySelectorAll('.qb-move-up-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         const idx = parseInt(btn.getAttribute('data-move-up'), 10);
@@ -3942,73 +3918,6 @@ window.BILINGUAL_SYNONYMS = {"electricity": ["ইলেকট্রিসিট�
         renderAll();
       });
     });
-
-    // 8. Drag & Drop Reordering + Pool Insertion on Paper Items
-    dropzone.querySelectorAll('.qb-paper-item').forEach(itemEl => {
-      itemEl.addEventListener('dragstart', (e) => {
-        const idx = parseInt(itemEl.getAttribute('data-paper-idx'), 10);
-        e.dataTransfer.setData('text/plain', JSON.stringify({ type: 'paper-reorder', fromIdx: idx }));
-        e.dataTransfer.effectAllowed = 'move';
-        itemEl.classList.add('qb-item-dragging');
-      });
-
-      itemEl.addEventListener('dragend', () => {
-        itemEl.classList.remove('qb-item-dragging');
-        dropzone.querySelectorAll('.qb-alt-dropzone').forEach(z => z.classList.add('hidden'));
-      });
-
-      itemEl.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        itemEl.classList.add('qb-drop-active');
-        const altZone = itemEl.querySelector('.qb-alt-dropzone');
-        if (altZone) altZone.classList.remove('hidden');
-      });
-
-      itemEl.addEventListener('dragleave', (e) => {
-        if (!itemEl.contains(e.relatedTarget)) {
-          itemEl.classList.remove('qb-drop-active');
-          const altZone = itemEl.querySelector('.qb-alt-dropzone');
-          if (altZone) altZone.classList.add('hidden');
-        }
-      });
-
-      itemEl.addEventListener('drop', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        itemEl.classList.remove('qb-drop-active');
-        const targetIdx = parseInt(itemEl.getAttribute('data-paper-idx'), 10);
-        const droppedOnAltZone = e.target.closest('.qb-alt-dropzone');
-
-        try {
-          const payload = JSON.parse(e.dataTransfer.getData('text/plain'));
-          if (payload.type === 'paper-reorder') {
-            const fromIdx = payload.fromIdx;
-            if (fromIdx !== targetIdx && fromIdx >= 0 && fromIdx < qbState.items.length) {
-              const [moved] = qbState.items.splice(fromIdx, 1);
-              qbState.items.splice(targetIdx, 0, moved);
-              saveQbStateToStorage();
-              renderQbPaper();
-            }
-          } else if (payload.type === 'pool-question') {
-            const q = state.questions.find(item => item.id === payload.qid);
-            if (!q) return;
-            if (droppedOnAltZone && qbState.items[targetIdx]) {
-              qbState.items[targetIdx].altQuestion = q.question;
-              showToast(`প্রশ্ন ${toBnNum(targetIdx + 1)}-এর ‘অথবা’ হিসেবে যুক্ত হয়েছে!`);
-            } else {
-              const newItem = createPaperItemFromQuestion(q);
-              qbState.items.splice(targetIdx + 1, 0, newItem);
-              showToast('প্রশ্নপত্রে প্রশ্নটি ড্রপ করা হয়েছে!');
-            }
-            saveQbStateToStorage();
-            renderQbAll();
-            renderAll();
-          }
-        } catch (err) {
-          console.error('Drop error:', err);
-        }
-      });
-    });
   }
 
   function renderQbAll() {
@@ -4017,64 +3926,39 @@ window.BILINGUAL_SYNONYMS = {"electricity": ["ইলেকট্রিসিট�
     renderQbPaper();
   }
 
-  // Format Exam Paper for Print / PDF and MS Word Copy
+  // Format Exam Paper for Print / PDF (Exact Trade-3.pdf visual layout!)
   function buildPrintableExamPaperHtml() {
     syncQbInputsToState();
     const totalCurrentMarks = getEffectivePaperMarks();
-    const tradeMeta = TRADES_META[qbState.tradeId] || TRADES_META['trade-3'];
-    const chLabel = qbState.chapterKey === 'all'
-      ? ''
-      : ` • ${qbState.chapterKey.includes('::') ? qbState.chapterKey.split('::')[1] : qbState.chapterKey}`;
-    const codeMap = {
-      'trade-1': 'বিষয় কোড: ৮৮২১/৫৮৮২১',
-      'trade-2': 'বিষয় কোড: ৮৮২২/৫৮৮২২',
-      'trade-3': 'বিষয় কোড: ৮৮২৩/৫৮৮২৩',
-      'trade-4': 'বিষয় কোড: ৮৮২৪/৫৮৮২৪'
-    };
 
     return `
-      <div class="text-black bg-white">
-        <div class="text-center border-b-2 border-black pb-3 mb-4">
+      <div class="text-black bg-white" style="font-family: 'Kalpurush', sans-serif; line-height: 1.6;">
+        <div class="text-center mb-4">
           <h1 class="text-2xl font-bold">${escapeHtml(qbState.institution)}</h1>
-          <h2 class="text-lg font-bold mt-0.5">${escapeHtml(qbState.examName)}</h2>
-          <p class="text-base font-semibold mt-0.5">বিষয়: ${escapeHtml(tradeMeta.title)}${escapeHtml(chLabel)}</p>
-          ${codeMap[qbState.tradeId] ? `<p class="text-sm font-semibold">${codeMap[qbState.tradeId]}</p>` : ''}
-          <div class="flex items-center justify-between mt-2 pt-1 text-sm font-bold">
+          <h2 class="text-lg font-medium mt-0.5">${escapeHtml(qbState.examName)}</h2>
+          <p class="text-base font-medium mt-0.5">${escapeHtml(qbState.subjectLine)}</p>
+          <div class="flex items-center justify-between mt-2 text-base font-bold">
             <span>সময়: ${escapeHtml(qbState.examTime)}</span>
             <span>পূর্ণমান: ${toBnNum(totalCurrentMarks || qbState.targetMarks)}</span>
           </div>
-          ${qbState.instruction ? `<p class="text-xs italic mt-1">${escapeHtml(qbState.instruction)}</p>` : ''}
+          ${qbState.instruction ? `<p class="text-base mt-1">${escapeHtml(qbState.instruction)}</p>` : ''}
         </div>
 
-        <div class="space-y-3">
+        <div class="space-y-1.5">
           ${qbState.items.map((item, idx) => {
             const prevType = idx > 0 ? qbState.items[idx - 1].base_type : null;
             const showSecBanner = qbState.qType === 'mixed_board' && item.base_type !== prevType;
             const secBannerTitle = showSecBanner ? getSectionHeaderForMixedBoard(item.base_type) : '';
             const secHtml = secBannerTitle
-              ? `<div class="pt-3 pb-1 border-b border-black font-bold text-base">${escapeHtml(secBannerTitle)}</div>`
+              ? `<div class="pt-4 pb-1 text-center font-normal text-base">${escapeHtml(secBannerTitle)}</div>`
               : '';
             const bTag = (qbState.showBoardTags && item.board_years && item.board_years.length > 0)
               ? ` <span class="text-xs font-normal">[${formatBoardYearsText(item.board_years)}]</span>`
               : '';
             return `
               ${secHtml}
-              <div class="flex items-start justify-between gap-4 py-1" style="break-inside: avoid;">
-                <div class="flex-1 text-base leading-relaxed">
-                  <div>
-                    <strong>${toBnNum(idx + 1)}।</strong> ${escapeHtml(item.question)}${bTag}
-                  </div>
-                  ${
-                    item.altQuestion
-                      ? `<div class="pl-5 mt-0.5 text-base">
-                          <strong>অথবা,</strong> ${escapeHtml(item.altQuestion)}
-                        </div>`
-                      : ''
-                  }
-                </div>
-                <div class="shrink-0 font-bold text-base pl-2">
-                  ${toBnNum(item.marks)}
-                </div>
+              <div class="py-0.5 text-base" style="break-inside: avoid;">
+                ${toBnNum(idx + 1)}। ${escapeHtml(item.question)}${bTag}
               </div>
             `;
           }).join('')}
@@ -4086,18 +3970,13 @@ window.BILINGUAL_SYNONYMS = {"electricity": ["ইলেকট্রিসিট�
   function formatExamPaperAsText() {
     syncQbInputsToState();
     const totalCurrentMarks = getEffectivePaperMarks();
-    const tradeMeta = TRADES_META[qbState.tradeId] || TRADES_META['trade-3'];
-    const chLabel = qbState.chapterKey === 'all'
-      ? ''
-      : ` (${qbState.chapterKey.includes('::') ? qbState.chapterKey.split('::')[1] : qbState.chapterKey})`;
 
     const lines = [
       qbState.institution,
       qbState.examName,
-      `বিষয়: ${tradeMeta.title}${chLabel}`,
-      `সময়: ${qbState.examTime} \t\t পূর্ণমান: ${toBnNum(totalCurrentMarks || qbState.targetMarks)}`,
+      qbState.subjectLine,
+      `সময়: ${qbState.examTime}\t\t\t\tপূর্ণমান: ${toBnNum(totalCurrentMarks || qbState.targetMarks)}`,
       qbState.instruction,
-      '------------------------------------------------------------',
       ''
     ];
 
@@ -4107,101 +3986,87 @@ window.BILINGUAL_SYNONYMS = {"electricity": ["ইলেকট্রিসিট�
         const secTitle = getSectionHeaderForMixedBoard(item.base_type);
         if (secTitle) {
           lines.push('');
-          lines.push(`=== ${secTitle} ===`);
+          lines.push(secTitle);
         }
       }
       const bTag = (qbState.showBoardTags && item.board_years && item.board_years.length > 0)
         ? ` [${formatBoardYearsText(item.board_years)}]`
         : '';
-      lines.push(`${toBnNum(idx + 1)}। ${item.question}${bTag} \t\t (${toBnNum(item.marks)})`);
-      if (item.altQuestion) {
-        lines.push(`   অথবা, ${item.altQuestion}`);
-      }
+      lines.push(`${toBnNum(idx + 1)}। ${item.question}${bTag}`);
     });
 
     return lines.join('\n');
   }
 
-  // Curated Trade-4 (IoT Basics-4) 60-Mark Common Test Question Paper (Based on Board + Extra Analysis)
+  // Curated Trade-4 (IoT Basics-4) 60-Mark Test Exam-2026 Question Paper (Exact Trade-3.pdf Pattern: 20 + 12 + 6 = 38 Single Questions)
   function loadTrade4Common60Paper() {
     const curatedSpecs = [
-      // ক-বিভাগ: অতি সংক্ষিপ্ত প্রশ্ন (১৫টি — যেকোনো ১২টির উত্তর: ১×১২=১২)
-      { id: 'q-292', marks: 1, alt: '' },
-      { id: 'q-295', marks: 1, alt: 'অপারেটর কী?' },
-      { id: 'q-298', marks: 1, alt: '' },
-      { id: 'q-308', marks: 1, alt: 'ভেরিয়েবল কী?' },
-      { id: 'q-311', marks: 1, alt: 'টাপল কী?' },
-      { id: 'q-382', marks: 1, alt: '' },
-      { id: 'q-368', marks: 1, alt: '৮০৫১ মাইক্রোকন্ট্রোলারের পিন সংখ্যা কত?' },
-      { id: 'q-375', marks: 1, alt: '' },
-      { id: 'q-428', marks: 1, alt: 'আইওটি বলতে কী বুঝায়?' },
-      { id: 'q-433', marks: 1, alt: '৪র্থ শিল্পবিপ্লবের দুটি উদাহরণ দাও।' },
-      { id: 'q-443', marks: 1, alt: '' },
-      { id: 'q-458', marks: 1, alt: 'র‍্যানসমওয়্যার কী?' },
-      { id: 'q-503', marks: 1, alt: '' },
-      { id: 'q-506', marks: 1, alt: 'সিমুলেশন কী?' },
-      { id: 'q-521', marks: 1, alt: 'Arduino UNO কী?' },
+      // ক-বিভাগ (মান: ১ x ২০ = ২০) — ২০টি অতি সংক্ষিপ্ত প্রশ্ন (অধ্যায় ১ থেকে ৪ ক্রমানুসারে)
+      { id: 'q-292', marks: 1 }, // ১। সুডোকোড বলতে কী বুঝায়?
+      { id: 'q-295', marks: 1 }, // ২। অপারেন্ড কাকে বলে?
+      { id: 'q-298', marks: 1 }, // ৩। পাইথন কী?
+      { id: 'q-308', marks: 1 }, // ৪। কীওয়ার্ড (Keyword) কী?
+      { id: 'q-309', marks: 1 }, // ৫। অপারেটর কী?
+      { id: 'q-312', marks: 1 }, // ৬। ভেরিয়েবল কী?
+      { id: 'q-311', marks: 1 }, // ৭। লুপ স্টেটমেন্ট (Loop Statement) কখন ব্যবহার হয়?
+      { id: 'q-368', marks: 1 }, // ৮। CPU, RAM, I/O-এর পূর্ণরূপ লেখ।
+      { id: 'q-382', marks: 1 }, // ৯। এমবেডেড সিস্টেম কাকে বলে?
+      { id: 'q-375', marks: 1 }, // ১০। মাইক্রোকন্ট্রোলার তাদের প্রসেসিং ক্ষমতা অনুসারে কত প্রকার ও কী কী?
+      { id: 'q-383', marks: 1 }, // ১১। ৮০৫১ মাইক্রোকন্ট্রোলারের পিন সংখ্যা কত?
+      { id: 'q-379', marks: 1 }, // ১২। ইন্টারাপ্ট কন্ট্রোল লজিক কী?
+      { id: 'q-428', marks: 1 }, // ১৩। IoT-এর পূর্ণরূপ কী?
+      { id: 'q-433', marks: 1 }, // ১৪। শিল্পবিপ্লব বলতে কী বুঝায়?
+      { id: 'q-431', marks: 1 }, // ১৫। ৪র্থ শিল্পবিপ্লবের দুটি উদাহরণ দাও
+      { id: 'q-443', marks: 1 }, // ১৬। সাইবার সিকিউরিটি কাকে বলে?
+      { id: 'q-458', marks: 1 }, // ১৭। ফিশিং কী?
+      { id: 'q-503', marks: 1 }, // ১৮। IoT তে ব্যবহৃত ৩টি প্রটোকল বা স্ট্যান্ডার্ড এর নাম লেখ।
+      { id: 'q-506', marks: 1 }, // ১৯। ৩টি সিমুলেশন সফটওয়্যারের নাম লেখ।
+      { id: 'q-521', marks: 1 }, // ২০। হোম অটোমেশন কী?
 
-      // খ-বিভাগ: সংক্ষিপ্ত প্রশ্ন (১৬টি — যেকোনো ১২টির উত্তর: ২×১২=২৪)
-      { id: 'q-330', marks: 2, alt: '' },
-      { id: 'q-331', marks: 2, alt: '' },
-      { id: 'q-344', marks: 2, alt: 'লাইব্রেরি বা বিল্ট-ইন (Built-in) ফাংশন বলতে কী বুঝায়?' },
-      { id: 'q-341', marks: 2, alt: 'অ্যালগরিদমের বৈশিষ্ট্য কী কী?' },
-      { id: 'q-353', marks: 2, alt: 'মেশিন ভাষার সুবিধা ও অসুবিধা কী?' },
-      { id: 'q-397', marks: 2, alt: 'মাইক্রোকন্ট্রোলার ও মাইক্রোপ্রসেসরের পার্থক্য কী?' },
-      { id: 'q-402', marks: 2, alt: 'ব্রেডবোর্ড কী?' },
-      { id: 'q-403', marks: 2, alt: 'মাইক্রোকন্ট্রোলারে VCC এবং GND পিনের কাজ কী?' },
-      { id: 'q-410', marks: 2, alt: '' },
-      { id: 'q-471', marks: 2, alt: 'হেলথ-কেয়ারে আইওটি ডিভাইসের ভূমিকা লেখ।' },
-      { id: 'q-476', marks: 2, alt: 'ক্লাউড কম্পিউটিং-এর সুবিধাগুলো লেখ।' },
-      { id: 'q-466', marks: 2, alt: 'চতুর্থ শিল্পবিপ্লবের পিলার কয়টি ও কী কী?' },
-      { id: 'q-473', marks: 2, alt: 'সাইবার সিকিউরিটির ক্ষতিকর প্রভাব কী?' },
-      { id: 'q-530', marks: 2, alt: 'সেন্সর কেন দরকার হয়?' },
-      { id: 'q-532', marks: 2, alt: 'আরডুইনো আইডিই (IDE) কী?' },
-      { id: 'q-524', marks: 2, alt: 'ডিভাইস টু ডিভাইস কমিউনিকেশন বর্ণনা কর।' },
+      // খ-বিভাগ (মান: ২ x ১০ = ২০) — ১২টি সংক্ষিপ্ত প্রশ্ন (যেকোনো ১০টির উত্তর দিতে হবে)
+      { id: 'q-330', marks: 2 }, // ২১। ডাটা টাইপ বলতে কী বুঝায়?
+      { id: 'q-331', marks: 2 }, // ২২। পাইথনে append() মেথডের কাজ কী?
+      { id: 'q-344', marks: 2 }, // ২৩। ফাংশনের প্রয়োজনীয়তা ব্যাখ্যা কর।
+      { id: 'q-341', marks: 2 }, // ২৪। অ্যালগরিদম ও ফ্লোচার্টের মধ্যে পার্থক্য লেখ।
+      { id: 'q-397', marks: 2 }, // ২৫। মাইক্রোকন্ট্রোলার কী?
+      { id: 'q-402', marks: 2 }, // ২৬। প্রোগ্রামার টুলস কী?
+      { id: 'q-403', marks: 2 }, // ২৭। সেভেন সেগমেন্ট ডিসপ্লে-এর গঠন দেখাও।
+      { id: 'q-466', marks: 2 }, // ২৮। চতুর্থ শিল্পবিপ্লবের সাথে তৃতীয় শিল্পবিপ্লবের পার্থক্য কী?
+      { id: 'q-471', marks: 2 }, // ২৯। বাসাবাড়িতে ব্যবহৃত কয়েকটি স্মার্ট ডিভাইসের তালিকা কর।
+      { id: 'q-476', marks: 2 }, // ৩০। ক্লাউড কম্পিউটিং কী?
+      { id: 'q-530', marks: 2 }, // ৩১। আইওটি এবং সেন্সরের মধ্যে পার্থক্য কী?
+      { id: 'q-532', marks: 2 }, // ৩২। আরডুইনোর ব্যবহার লেখ।
 
-      // গ-বিভাগ: রচনামূলক প্রশ্ন (৭টি — যেকোনো ৪টির উত্তর: ৬×৪=২৪)
-      { id: 'q-361', marks: 6, alt: 'কন্ডিশনাল স্টেটমেন্টগুলোর স্ট্রাকচার ও কাজ লেখ।' },
-      { id: 'q-360', marks: 6, alt: 'লিস্ট কী? লিস্টের বেসিক মেথডগুলোর বর্ণনা কর।' },
-      { id: 'q-418', marks: 6, alt: 'মাইক্রোকন্ট্রোলারের অভ্যন্তরীণ কম্পোনেন্টসমূহ বর্ণনা কর।' },
-      { id: 'q-420', marks: 6, alt: '৮০৫১ অথবা PIC 16F84A মাইক্রোকন্ট্রোলারের পিন ডায়াগ্রাম অঙ্কনপূর্বক পিনসমূহের কাজ লেখ।' },
-      { id: 'q-495', marks: 6, alt: 'আইওটির ব্যবহারিক প্রয়োগক্ষেত্রসমূহ উদাহরণসহ লেখ।' },
-      { id: 'q-497', marks: 6, alt: 'বিগ ডাটা (Big Data) কাকে বলে? এর বৈশিষ্ট্যগুলো লেখ।' },
-      { id: 'q-544', marks: 6, alt: 'আইওটি সিস্টেম বাস্তবায়নের ধাপসমূহ ও কয়েকটি প্রটোকলের কাজ আলোচনা কর।' }
+      // গ-বিভাগ (মান: ৪ x ৫ = ২০) — ৬টি রচনামূলক প্রশ্ন (যেকোনো ৫টির উত্তর দিতে হবে)
+      { id: 'q-361', marks: 4 }, // ৩৩। প্রোগ্রাম তৈরির ধাপসমূহ আলোচনা কর।
+      { id: 'q-360', marks: 4 }, // ৩৪। For লুপ ও While লুপের স্ট্রাকচার ও কার্যপ্রণালি পার্থক্য লেখ।
+      { id: 'q-418', marks: 4 }, // ৩৫। প্রসেসিং ক্যাপাসিটি অনুসারে মাইক্রোকন্ট্রোলারের প্রকারভেদ আলোচনা কর
+      { id: 'q-495', marks: 4 }, // ৩৬। আইওটি মৌলিক উপাদানসমূহ কী কী? বর্ণনা কর।
+      { id: 'q-497', marks: 4 }, // ৩৭। সাইবার নিরাপত্তা কেন গুরুত্বপূর্ণ?
+      { id: 'q-496', marks: 4 }  // ৩৮। ৫টি বহুল ব্যবহৃত সেন্সরের কাজ বর্ণনা কর।
     ];
 
     qbState.tradeId = 'trade-4';
     qbState.chapterKey = 'all';
     qbState.qType = 'mixed_board';
     qbState.targetMarks = 60;
-    qbState.examName = 'এসএসসি (ভোকেশনাল) চূড়ান্ত মডেল টেস্ট - ২০২৬';
-    qbState.examTime = '৩ ঘণ্টা';
-    qbState.instruction = '[দ্রষ্টব্য: ডান পাশের সংখ্যা প্রশ্নের পূর্ণমান জ্ঞাপক। ক-বিভাগ হতে যেকোনো ১২টি (১×১২=১২), খ-বিভাগ হতে যেকোনো ১২টি (২×১২=২৪) এবং গ-বিভাগ হতে যেকোনো ৪টি (৬×৪=২৪) প্রশ্নের উত্তর দাও।]';
+    qbState.institution = 'সফির উদ্দিন হাই স্কুল এন্ড কলেজ';
+    qbState.examName = 'দশম (ভোকেশনাল) শ্রেণি টেস্ট পরীক্ষা-২০২৬';
+    qbState.subjectLine = 'বিষয়: আইটি সাপোর্ট এন্ড আইওটি বেসিকস-৪ (Trade-4)';
+    qbState.customSubjectEdited = false;
+    qbState.examTime = '৩ ঘন্টা';
+    qbState.instruction = '[দ্রষ্টব্য: ক-বিভাগের সকল, খ-বিভাগের যে কোন ১০টি এবং গ-বিভাগের যে কোন ৫টি প্রশ্নের উত্তর দাও]';
 
-    const trEl = document.getElementById('qb-trade-select');
-    const tpEl = document.getElementById('qb-type-select');
-    const mkEl = document.getElementById('qb-total-marks-input');
-    const exEl = document.getElementById('qb-exam-name-input');
-    const tmEl = document.getElementById('qb-exam-time-input');
-    const inEl = document.getElementById('qb-instruction-input');
-
-    if (trEl) trEl.value = 'trade-4';
     renderQbChapterOptions();
     const chEl = document.getElementById('qb-chapter-select');
     if (chEl) chEl.value = 'all';
-    if (tpEl) tpEl.value = 'mixed_board';
-    if (mkEl) mkEl.value = '60';
-    if (exEl) exEl.value = qbState.examName;
-    if (tmEl) tmEl.value = qbState.examTime;
-    if (inEl) inEl.value = qbState.instruction;
+    syncStateToQbHeaderInputs();
 
     const items = [];
     curatedSpecs.forEach(spec => {
       const q = state.questions.find(item => item.id === spec.id);
       if (q) {
-        const pItem = createPaperItemFromQuestion(q, spec.marks);
-        if (spec.alt) pItem.altQuestion = spec.alt;
-        items.push(pItem);
+        items.push(createPaperItemFromQuestion(q, spec.marks));
       }
     });
 
@@ -4209,7 +4074,7 @@ window.BILINGUAL_SYNONYMS = {"electricity": ["ইলেকট্রিসিট�
     saveQbStateToStorage();
     renderQbAll();
     renderAll();
-    showToast('ট্রেড-৪ এর ৬০ নম্বরের কমন বোর্ড মডেল টেস্ট প্রশ্নপত্র লোড করা হয়েছে!');
+    showToast('ট্রেড-৪ এর ৬০ নম্বরের টেস্ট পরীক্ষা-২০২৬ প্রশ্নপত্র লোড করা হয়েছে!');
   }
 
   function switchQbMobileTab(tabName) {
@@ -4246,27 +4111,9 @@ window.BILINGUAL_SYNONYMS = {"electricity": ["ইলেকট্রিসিট�
     const openBtn = document.getElementById('open-question-builder-btn');
     if (openBtn) {
       openBtn.addEventListener('click', () => {
-        // Sync initial trade/chapter from main app if user had one active
-        if (state.activeTrade !== 'all') {
-          qbState.tradeId = state.activeTrade;
-          const trEl = document.getElementById('qb-trade-select');
-          if (trEl) trEl.value = qbState.tradeId;
-        }
-        renderQbChapterOptions();
-        if (state.activeChapter !== 'all') {
-          qbState.chapterKey = state.activeChapter;
-          const chEl = document.getElementById('qb-chapter-select');
-          if (chEl) chEl.value = qbState.chapterKey;
-        }
-        if (state.activeType !== 'all') {
-          qbState.qType = state.activeType;
-          const tpEl = document.getElementById('qb-type-select');
-          if (tpEl) tpEl.value = qbState.qType;
-        }
-
-        // If paper is empty on first open, auto-generate a default 10-mark paper so user immediately sees it in action!
+        // If paper is empty on first open, load the default Trade-4 60-mark Test Exam-2026 paper!
         if (qbState.items.length === 0) {
-          autoGenerateExamPaper(false);
+          loadTrade4Common60Paper();
         } else {
           renderQbAll();
         }
@@ -4280,6 +4127,8 @@ window.BILINGUAL_SYNONYMS = {"electricity": ["ইলেকট্রিসিট�
       tradeSelect.addEventListener('change', (e) => {
         qbState.tradeId = e.target.value;
         qbState.chapterKey = 'all';
+        qbState.customSubjectEdited = false;
+        qbState.subjectLine = getDefaultSubjectLineForTrade(qbState.tradeId, qbState.chapterKey);
         renderQbAll();
       });
     }
@@ -4288,6 +4137,9 @@ window.BILINGUAL_SYNONYMS = {"electricity": ["ইলেকট্রিসিট�
     if (chSelect) {
       chSelect.addEventListener('change', (e) => {
         qbState.chapterKey = e.target.value;
+        if (!qbState.customSubjectEdited) {
+          qbState.subjectLine = getDefaultSubjectLineForTrade(qbState.tradeId, qbState.chapterKey);
+        }
         renderQbPool();
         renderQbPaper();
       });
@@ -4301,14 +4153,18 @@ window.BILINGUAL_SYNONYMS = {"electricity": ["ইলেকট্রিসিট�
       });
     }
 
-    // Live Header Inputs
-    ['qb-total-marks-input', 'qb-exam-name-input', 'qb-exam-time-input', 'qb-institution-input', 'qb-instruction-input'].forEach(id => {
+    // Live Header Inputs (directly inside the preview question paper + target marks)
+    ['qb-total-marks-input', 'qb-institution-input', 'qb-exam-name-input', 'qb-subject-line-input', 'qb-exam-time-input', 'qb-instruction-input'].forEach(id => {
       const el = document.getElementById(id);
       if (el) {
         el.addEventListener('input', () => {
+          if (id === 'qb-subject-line-input') {
+            qbState.customSubjectEdited = true;
+          }
           syncQbInputsToState();
           saveQbStateToStorage();
-          renderQbPaper();
+          const marksEl = document.getElementById('qb-paper-marks-display');
+          if (marksEl) marksEl.textContent = toBnNum(getEffectivePaperMarks() || qbState.targetMarks);
         });
       }
     });
@@ -4373,7 +4229,6 @@ window.BILINGUAL_SYNONYMS = {"electricity": ["ইলেকট্রিসিট�
           uid: `pitem-${Date.now()}`,
           sourceId: null,
           question: 'নতুন প্রশ্ন এখানে লিখুন...',
-          altQuestion: '',
           marks: defaultMark,
           base_type: 'short',
           board_years: [],
@@ -4411,36 +4266,6 @@ window.BILINGUAL_SYNONYMS = {"electricity": ["ইলেকট্রিসিট�
         renderQbAll();
         renderAll();
         showToast('প্রশ্নপত্র খালি করা হয়েছে');
-      });
-    }
-
-    // Dropzone container dragover/drop for dropping into empty space or end of paper
-    const dropzone = document.getElementById('qb-paper-dropzone');
-    if (dropzone) {
-      dropzone.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        dropzone.classList.add('qb-drop-active');
-      });
-      dropzone.addEventListener('dragleave', (e) => {
-        if (!dropzone.contains(e.relatedTarget)) {
-          dropzone.classList.remove('qb-drop-active');
-        }
-      });
-      dropzone.addEventListener('drop', (e) => {
-        e.preventDefault();
-        dropzone.classList.remove('qb-drop-active');
-        try {
-          const payload = JSON.parse(e.dataTransfer.getData('text/plain'));
-          if (payload.type === 'pool-question') {
-            const q = state.questions.find(item => item.id === payload.qid);
-            if (!q) return;
-            qbState.items.push(createPaperItemFromQuestion(q));
-            saveQbStateToStorage();
-            renderQbAll();
-            renderAll();
-            showToast('প্রশ্নপত্রে প্রশ্নটি যুক্ত হয়েছে!');
-          }
-        } catch (err) {}
       });
     }
 
