@@ -22,4 +22,4 @@
 - **Vanilla JavaScript (ES6+)**
 - **Tailwind CSS (CDN)**
 - **FontAwesome 6 Icons**
-- **Google Fonts (`Hind Siliguri` & `Plus Jakarta Sans`)**
+- **Kalpurush Bangla Font CDN (`https://fonts.maateen.me/kalpurush/font.css`) & Plus Jakarta Sans**
