@@ -659,16 +659,16 @@
             }"
           >
             <div class="flex items-start justify-between gap-2">
-              <span class="text-xs font-semibold leading-snug ${isActive ? 'text-indigo-700 dark:text-indigo-200' : 'text-slate-700 dark:text-slate-200'}">
+              <span class="text-sm font-semibold leading-snug ${isActive ? 'text-indigo-700 dark:text-indigo-200' : 'text-slate-700 dark:text-slate-200'}">
                 ${escapeHtml(ch.chapter)}
               </span>
-              <span class="shrink-0 px-1.5 py-0.5 text-[11px] rounded-md font-bold ${
+              <span class="shrink-0 px-2 py-0.5 text-xs rounded-md font-bold ${
                 isActive
                   ? 'bg-indigo-600 text-white'
                   : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
               }">${toBnNum(ch.matching)}</span>
             </div>
-            <div class="flex items-center gap-2 text-[10px] text-slate-400 dark:text-slate-400">
+            <div class="flex items-center gap-2.5 text-xs text-slate-400 dark:text-slate-400">
               <span title="মোট প্রশ্ন"><i class="fa-regular fa-file-lines mr-0.5"></i>মোট ${toBnNum(ch.total)}</span>
               ${
                 ch.board > 0
@@ -890,7 +890,7 @@
 
     const mainHighlighted = highlightText(q.question, expandedSearch);
     const mainYearsTag = q.main_years && q.main_years.length > 0
-      ? `<span class="inline-flex items-center gap-1 ml-1.5 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/80">[${formatBoardYearsText(q.main_years)}]</span>`
+      ? `<span class="inline-flex items-center gap-1 ml-1.5 px-2.5 py-0.5 rounded-md text-xs sm:text-[13px] font-semibold bg-emerald-50 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/80">[${formatBoardYearsText(q.main_years)}]</span>`
       : '';
 
     if (isCompact) {
@@ -901,21 +901,21 @@
             : hasBoard
             ? 'border-emerald-200/80 dark:border-emerald-900/50'
             : 'border-slate-200/80 dark:border-slate-700/80'
-        } px-3.5 py-2.5 hover:shadow-sm transition-all flex items-start justify-between gap-3">
-          <div class="flex items-start gap-2.5 min-w-0 flex-1">
-            <span class="shrink-0 px-2 py-0.5 rounded-md text-xs font-bold ${typeMeta.numClass} mt-0.5">${escapeHtml(q.q_no_bn)}।</span>
+        } px-4 py-3 hover:shadow-sm transition-all flex items-start justify-between gap-3">
+          <div class="flex items-start gap-3 min-w-0 flex-1">
+            <span class="shrink-0 px-2.5 py-0.5 rounded-md text-xs sm:text-sm font-bold ${typeMeta.numClass} mt-0.5">${escapeHtml(q.q_no_bn)}।</span>
             <div class="min-w-0 flex-1">
-              <div class="text-sm sm:text-[15px] font-medium text-slate-800 dark:text-slate-100 leading-relaxed">
+              <div class="text-base sm:text-[18px] font-medium text-slate-800 dark:text-slate-100 leading-relaxed">
                 ${mainHighlighted} ${mainYearsTag}
               </div>
               ${
                 q.alternatives && q.alternatives.length > 0
-                  ? `<div class="mt-1 space-y-1 pl-2 border-l-2 border-indigo-200 dark:border-indigo-800">
+                  ? `<div class="mt-1.5 space-y-1 pl-2.5 border-l-2 border-indigo-200 dark:border-indigo-800">
                       ${q.alternatives.map(alt => `
-                        <div class="text-xs sm:text-sm text-slate-600 dark:text-slate-300">
+                        <div class="text-sm sm:text-base text-slate-600 dark:text-slate-300">
                           <span class="font-bold text-indigo-600 dark:text-indigo-400">অথবা,</span>
                           ${highlightText(alt.text, expandedSearch)}
-                          ${alt.years && alt.years.length ? `<span class="text-[11px] font-semibold text-emerald-700 dark:text-emerald-400 ml-1">[${formatBoardYearsText(alt.years)}]</span>` : ''}
+                          ${alt.years && alt.years.length ? `<span class="text-xs sm:text-[13px] font-semibold text-emerald-700 dark:text-emerald-400 ml-1">[${formatBoardYearsText(alt.years)}]</span>` : ''}
                         </div>
                       `).join('')}
                     </div>`
@@ -967,34 +967,34 @@
         <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
           <div class="flex flex-wrap items-center gap-1.5">
             <!-- Serial Number -->
-            <span class="inline-flex items-center justify-center px-2.5 py-1 rounded-lg text-xs font-bold ${typeMeta.numClass} shadow-xs">
+            <span class="inline-flex items-center justify-center px-2.5 py-1 rounded-lg text-xs sm:text-sm font-bold ${typeMeta.numClass} shadow-xs">
               প্রশ্ন ${escapeHtml(q.q_no_bn)}
             </span>
             <!-- Trade & Chapter Badge -->
-            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-slate-100 dark:bg-slate-700/80 text-slate-600 dark:text-slate-300">
-              <i class="fa-solid fa-book-bookmark text-indigo-500 text-[10px]"></i>
+            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs sm:text-[13px] font-semibold bg-slate-100 dark:bg-slate-700/80 text-slate-600 dark:text-slate-300">
+              <i class="fa-solid fa-book-bookmark text-indigo-500 text-[11px]"></i>
               <span>${escapeHtml(getShortTradeBadge(q.trade_id, q.trade_name))} • ${escapeHtml(q.chapter.split(':')[0])}</span>
             </span>
             <!-- Section / Type Badge -->
-            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold border ${typeMeta.badgeClass}">
-              <i class="fa-solid ${typeMeta.icon} text-[10px]"></i>
+            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs sm:text-[13px] font-semibold border ${typeMeta.badgeClass}">
+              <i class="fa-solid ${typeMeta.icon} text-[11px]"></i>
               <span>${escapeHtml(q.section)}</span>
             </span>
             <!-- Importance Badge -->
             ${
               isTop
-                ? `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-rose-50 dark:bg-rose-950/80 text-rose-600 dark:text-rose-300 border border-rose-200 dark:border-rose-800">
+                ? `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs sm:text-[13px] font-bold bg-rose-50 dark:bg-rose-950/80 text-rose-600 dark:text-rose-300 border border-rose-200 dark:border-rose-800">
                     <i class="fa-solid fa-fire text-rose-500"></i> অতি গুরুত্বপূর্ণ ★★★
                   </span>`
                 : isImp
-                ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[11px] font-semibold bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800/70">
+                ? `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-xs sm:text-[13px] font-semibold bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800/70">
                     <i class="fa-solid fa-star-half-stroke text-amber-500"></i> গুরুত্বপূর্ণ
                   </span>`
                 : ''
             }
             ${
               (q.topic_tags || []).map(tag => `
-                <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold bg-indigo-50 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-800/60">
+                <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold bg-indigo-50 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-800/60">
                   #${escapeHtml(tag)}
                 </span>
               `).join('')
@@ -1010,7 +1010,7 @@
                       <button
                         type="button"
                         data-year-pill="${yr}"
-                        class="board-year-pill px-2 py-0.5 rounded-md text-[11px] font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-2xs transition-colors"
+                        class="board-year-pill px-2.5 py-0.5 rounded-md text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-2xs transition-colors"
                         title="বাকাশিবো-${toBnNum(yr)} সালের সকল প্রশ্ন দেখুন"
                       >
                         বাকাশিবো ’${toBnNum(String(yr).slice(-2))}
@@ -1043,7 +1043,7 @@
         </div>
 
         <!-- Main Question Text -->
-        <div class="text-base sm:text-[17px] font-semibold text-slate-900 dark:text-slate-100 leading-relaxed">
+        <div class="text-lg sm:text-[20px] font-semibold text-slate-900 dark:text-slate-100 leading-relaxed">
           <span class="text-indigo-600 dark:text-indigo-400 mr-1">${escapeHtml(q.q_no_bn)}।</span>
           <span>${mainHighlighted}</span>
           ${mainYearsTag}
@@ -1054,15 +1054,15 @@
           q.alternatives && q.alternatives.length > 0
             ? `<div class="mt-3 pt-2.5 border-t border-dashed border-slate-200 dark:border-slate-700/80 space-y-2">
                 ${q.alternatives.map(alt => `
-                  <div class="flex items-start gap-2 pl-2 sm:pl-3 border-l-3 border-indigo-400 dark:border-indigo-500 bg-indigo-50/40 dark:bg-indigo-950/30 py-1.5 px-2.5 rounded-r-xl">
-                    <span class="shrink-0 inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-bold bg-indigo-100 dark:bg-indigo-900/80 text-indigo-700 dark:text-indigo-300 mt-0.5">
+                  <div class="flex items-start gap-2.5 pl-2.5 sm:pl-3.5 border-l-3 border-indigo-400 dark:border-indigo-500 bg-indigo-50/40 dark:bg-indigo-950/30 py-2 px-3 rounded-r-xl">
+                    <span class="shrink-0 inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-bold bg-indigo-100 dark:bg-indigo-900/80 text-indigo-700 dark:text-indigo-300 mt-0.5">
                       অথবা
                     </span>
-                    <div class="text-sm sm:text-[15px] font-medium text-slate-700 dark:text-slate-200 leading-relaxed">
+                    <div class="text-base sm:text-[18px] font-medium text-slate-700 dark:text-slate-200 leading-relaxed">
                       ${highlightText(alt.text, expandedSearch)}
                       ${
                         alt.years && alt.years.length > 0
-                          ? `<span class="inline-flex items-center ml-1.5 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-950/90 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">[${formatBoardYearsText(alt.years)}]</span>`
+                          ? `<span class="inline-flex items-center ml-1.5 px-2.5 py-0.5 rounded-md text-xs sm:text-[13px] font-semibold bg-emerald-50 dark:bg-emerald-950/90 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">[${formatBoardYearsText(alt.years)}]</span>`
                           : ''
                       }
                     </div>
