@@ -141,7 +141,7 @@
     sortBy: 'serial',   // 'serial', 'importance_desc', 'board_count_desc', 'board_year_desc', 'type_asc', 'alt_count_desc', 'chapter_desc'
     viewMode: 'grouped', // 'grouped', 'list', 'compact'
     collapsedGroups: new Set(),
-    darkMode: false
+    darkMode: true
   };
 
   // Load persisted data
@@ -161,13 +161,17 @@
       state.questions = [...(window.INITIAL_QUESTIONS_DATA || []), ...customQs];
 
       const savedTheme = localStorage.getItem('vi_dark_mode');
-      if (savedTheme === 'true') {
+      if (savedTheme === 'false') {
+        state.darkMode = false;
+        document.documentElement.classList.remove('dark');
+      } else {
         state.darkMode = true;
         document.documentElement.classList.add('dark');
       }
     } catch (err) {
       console.error('Storage load error:', err);
       state.questions = [...(window.INITIAL_QUESTIONS_DATA || [])];
+      document.documentElement.classList.add('dark');
     }
   }
 

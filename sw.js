@@ -1,4 +1,4 @@
-const CACHE_NAME = 'vocational-intelligence-v2';
+const CACHE_NAME = 'vocational-intelligence-v3';
 const CORE_ASSETS = [
   './',
   './index.html',

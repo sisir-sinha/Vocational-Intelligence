@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="bn" class="scroll-smooth">
+<html lang="bn" class="scroll-smooth dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -808,7 +808,7 @@ window.BILINGUAL_SYNONYMS = {"electricity": ["ইলেকট্রিসিট�
     sortBy: 'serial',   // 'serial', 'importance_desc', 'board_count_desc', 'board_year_desc', 'type_asc', 'alt_count_desc', 'chapter_desc'
     viewMode: 'grouped', // 'grouped', 'list', 'compact'
     collapsedGroups: new Set(),
-    darkMode: false
+    darkMode: true
   };
 
   // Load persisted data
@@ -828,13 +828,17 @@ window.BILINGUAL_SYNONYMS = {"electricity": ["ইলেকট্রিসিট�
       state.questions = [...(window.INITIAL_QUESTIONS_DATA || []), ...customQs];
 
       const savedTheme = localStorage.getItem('vi_dark_mode');
-      if (savedTheme === 'true') {
+      if (savedTheme === 'false') {
+        state.darkMode = false;
+        document.documentElement.classList.remove('dark');
+      } else {
         state.darkMode = true;
         document.documentElement.classList.add('dark');
       }
     } catch (err) {
       console.error('Storage load error:', err);
       state.questions = [...(window.INITIAL_QUESTIONS_DATA || [])];
+      document.documentElement.classList.add('dark');
     }
   }
 
