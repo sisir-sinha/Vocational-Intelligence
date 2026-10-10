@@ -50,6 +50,11 @@
     body, input, select, textarea, button {
       font-family: 'Kalpurush', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
     }
+    .dark select,
+    .dark select option {
+      background-color: #1e293b;
+      color: #f8fafc;
+    }
     mark.vi-highlight {
       background-color: #fef08a;
       color: #854d0e;
@@ -382,15 +387,15 @@
           </label>
           <select
             id="sort-by-select"
-            class="w-full px-3 py-2 rounded-xl bg-indigo-50/60 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800 text-xs sm:text-sm font-bold text-indigo-900 dark:text-indigo-200 focus:outline-none focus:border-indigo-500"
+            class="w-full px-3 py-2 rounded-xl bg-slate-900 dark:bg-slate-800 border border-slate-700 dark:border-slate-700 text-xs sm:text-sm font-bold text-white dark:text-slate-100 focus:outline-none focus:border-indigo-500"
           >
-            <option value="serial">অধ্যায় ও ক্রমানুসারে (Default Serial)</option>
-            <option value="importance_desc">🔥 গুরুত্ব অনুসারে (অতি গুরুত্বপূর্ণ আগে)</option>
-            <option value="board_count_desc">🏆 বোর্ডে আসার সংখ্যা অনুসারে (সর্বাধিকবার আসা আগে)</option>
-            <option value="board_year_desc">📅 সর্বশেষ বোর্ড সাল অনুসারে (২০২৬ → ২০০৯)</option>
-            <option value="type_asc">📑 প্রশ্নের ধরন অনুসারে (অতি সংক্ষিপ্ত → রচনামূলক)</option>
-            <option value="alt_count_desc">🔀 বিকল্প (‘অথবা’) প্রশ্নের সংখ্যা অনুসারে</option>
-            <option value="chapter_desc">⏬ অধ্যায় ক্রমানুসারে (শেষ অধ্যায় আগে)</option>
+            <option class="bg-slate-900 text-white" value="serial">অধ্যায় ও ক্রমানুসারে (Default Serial)</option>
+            <option class="bg-slate-900 text-white" value="importance_desc">🔥 গুরুত্ব অনুসারে (অতি গুরুত্বপূর্ণ আগে)</option>
+            <option class="bg-slate-900 text-white" value="board_count_desc">🏆 বোর্ডে আসার সংখ্যা অনুসারে (সর্বাধিকবার আসা আগে)</option>
+            <option class="bg-slate-900 text-white" value="board_year_desc">📅 সর্বশেষ বোর্ড সাল অনুসারে (২০২৬ → ২০০৯)</option>
+            <option class="bg-slate-900 text-white" value="type_asc">📑 প্রশ্নের ধরন অনুসারে (অতি সংক্ষিপ্ত → রচনামূলক)</option>
+            <option class="bg-slate-900 text-white" value="alt_count_desc">🔀 বিকল্প (‘অথবা’) প্রশ্নের সংখ্যা অনুসারে</option>
+            <option class="bg-slate-900 text-white" value="chapter_desc">⏬ অধ্যায় ক্রমানুসারে (শেষ অধ্যায় আগে)</option>
           </select>
         </div>
       </div>
