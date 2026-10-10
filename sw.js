@@ -1,4 +1,4 @@
-const CACHE_NAME = 'vocai-pwa-v11';
+const CACHE_NAME = 'vocai-pwa-v12';
 const CORE_ASSETS = [
   './',
   './index.html',
