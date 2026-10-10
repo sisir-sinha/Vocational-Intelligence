@@ -3,6 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#4f46e5" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Vocational Intelligence" />
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png" />
+  <link rel="apple-touch-icon" href="./icon-192.png" />
   <title>Vocational Intelligence — ভোকেশনাল আইওটি বেসিকস প্রশ্নব্যাংক (নবম ও দশম শ্রেণি)</title>
 
   <!-- Tailwind CSS CDN -->
@@ -70,7 +77,7 @@
     }
     /* Print friendly styles */
     @media print {
-      header, aside, .no-print, #vi-toast, #analytics-modal, #import-modal {
+      header, aside, .no-print, #vi-toast, #pwa-install-toast, #analytics-modal, #import-modal {
         display: none !important;
       }
       body {
@@ -125,6 +132,17 @@
 
         <!-- Header Action Buttons -->
         <div class="flex items-center gap-2 ml-auto">
+          <!-- PWA Install App Button -->
+          <button
+            type="button"
+            id="header-install-btn"
+            class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs sm:text-sm font-bold bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-sm shadow-indigo-500/20 transition-all"
+            title="ডিভাইসে Vocational Intelligence অ্যাপটি ইনস্টল করুন"
+          >
+            <i class="fa-solid fa-download"></i>
+            <span class="hidden sm:inline">ইনস্টল অ্যাপ</span>
+          </button>
+
           <!-- Board Analytics Button -->
           <button
             type="button"
@@ -581,6 +599,52 @@
           </div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- Long-Duration Launch PWA Install Toast -->
+  <div
+    id="pwa-install-toast"
+    class="fixed bottom-4 left-3 right-3 sm:left-auto sm:right-5 sm:max-w-md z-50 transform translate-y-28 opacity-0 pointer-events-none transition-all duration-500 bg-slate-900/95 dark:bg-slate-800/95 backdrop-blur-md text-white rounded-2xl border border-indigo-500/40 shadow-2xl overflow-hidden"
+  >
+    <div class="p-4 flex items-start gap-3.5">
+      <img
+        src="./icon-192.png"
+        alt="Vocational Intelligence"
+        class="w-12 h-12 rounded-xl shrink-0 shadow-md border border-white/10"
+      />
+      <div class="min-w-0 flex-1">
+        <div class="flex items-start justify-between gap-2">
+          <h4 class="text-sm sm:text-base font-bold text-white leading-snug">
+            Vocational Intelligence অ্যাপটি ইনস্টল করুন
+          </h4>
+          <button
+            type="button"
+            id="pwa-toast-close-btn"
+            class="w-6 h-6 rounded-lg bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white flex items-center justify-center text-xs shrink-0 transition-colors"
+            title="বন্ধ করুন"
+          >
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <p class="text-xs sm:text-[13px] text-slate-300 mt-1 leading-relaxed">
+          ইন্টারনেট ছাড়াই অফলাইনে দ্রুত প্রশ্ন ও বোর্ড সাজেশন খুঁজতে আপনার মোবাইল বা কম্পিউটারে অ্যাপটি ইনস্টল করে নিন।
+        </p>
+        <div class="mt-3 flex items-center gap-2">
+          <button
+            type="button"
+            id="pwa-toast-install-btn"
+            class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-indigo-600 hover:bg-indigo-500 text-white shadow-md shadow-indigo-500/30 transition-all"
+          >
+            <i class="fa-solid fa-download"></i>
+            <span>এখনই ইনস্টল করুন (Install App)</span>
+          </button>
+        </div>
+      </div>
+    </div>
+    <!-- Long-duration (30s) visual progress bar -->
+    <div class="w-full h-1 bg-slate-800">
+      <div id="pwa-install-progress" class="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-emerald-400" style="width: 100%"></div>
     </div>
   </div>
 
@@ -2511,8 +2575,152 @@ window.BILINGUAL_SYNONYMS = {"electricity": ["ইলেকট্রিসিট�
       if (e.key === 'Escape') {
         closeModal('analytics-modal');
         closeModal('import-modal');
+        hidePwaInstallToast();
       }
     });
+
+    initPwaInstallFeature();
+  }
+
+  // PWA Service Worker & Long-Duration Launch Install Toast
+  let deferredInstallPrompt = null;
+  let installToastTimer = null;
+
+  function isRunningStandalone() {
+    return (
+      window.matchMedia('(display-mode: standalone)').matches ||
+      window.navigator.standalone === true
+    );
+  }
+
+  function showPwaInstallToast(durationMs = 30000) {
+    if (isRunningStandalone()) return;
+    const toastEl = document.getElementById('pwa-install-toast');
+    const progressEl = document.getElementById('pwa-install-progress');
+    if (!toastEl) return;
+
+    toastEl.classList.remove('translate-y-28', 'opacity-0', 'pointer-events-none');
+    toastEl.classList.add('translate-y-0', 'opacity-100');
+
+    if (progressEl) {
+      progressEl.style.transition = 'none';
+      progressEl.style.width = '100%';
+      // Trigger reflow then animate width to 0 over durationMs
+      void progressEl.offsetWidth;
+      progressEl.style.transition = `width ${durationMs}ms linear`;
+      progressEl.style.width = '0%';
+    }
+
+    if (installToastTimer) clearTimeout(installToastTimer);
+    installToastTimer = setTimeout(() => {
+      hidePwaInstallToast();
+    }, durationMs);
+  }
+
+  function hidePwaInstallToast() {
+    const toastEl = document.getElementById('pwa-install-toast');
+    if (!toastEl) return;
+    toastEl.classList.add('translate-y-28', 'opacity-0', 'pointer-events-none');
+    toastEl.classList.remove('translate-y-0', 'opacity-100');
+    if (installToastTimer) {
+      clearTimeout(installToastTimer);
+      installToastTimer = null;
+    }
+  }
+
+  async function triggerPwaInstall() {
+    if (deferredInstallPrompt) {
+      try {
+        deferredInstallPrompt.prompt();
+        const choiceResult = await deferredInstallPrompt.userChoice;
+        if (choiceResult.outcome === 'accepted') {
+          hidePwaInstallToast();
+          showToast('Vocational Intelligence সফলভাবে ইনস্টল হচ্ছে!');
+        }
+        deferredInstallPrompt = null;
+      } catch (err) {
+        console.error('Install prompt error:', err);
+      }
+    } else {
+      // Fallback guidance if browser hasn't fired beforeinstallprompt yet
+      showToast('ব্রাউজারের ⋮ মেনু বা অ্যাড্রেস বারের ইনস্টল আইকন থেকে "Install app" বা "Add to Home screen"-এ ক্লিক করুন');
+    }
+  }
+
+  function initPwaInstallFeature() {
+    // 1. Register Service Worker for Chrome PWA Installability
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js', { scope: './' }).catch(err => {
+          console.warn('SW registration notice:', err);
+        });
+      });
+    }
+
+    const headerInstallBtn = document.getElementById('header-install-btn');
+    const toastInstallBtn = document.getElementById('pwa-toast-install-btn');
+    const toastCloseBtn = document.getElementById('pwa-toast-close-btn');
+    const toastEl = document.getElementById('pwa-install-toast');
+    const progressEl = document.getElementById('pwa-install-progress');
+
+    if (isRunningStandalone() && headerInstallBtn) {
+      headerInstallBtn.classList.add('hidden');
+    }
+
+    // 2. Capture Chrome's beforeinstallprompt event
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredInstallPrompt = e;
+      if (headerInstallBtn) {
+        headerInstallBtn.classList.remove('hidden');
+        headerInstallBtn.classList.add('inline-flex');
+      }
+      // Show or refresh the long-duration install toast (30 seconds)
+      showPwaInstallToast(30000);
+    });
+
+    // 3. Hide install UI once installed
+    window.addEventListener('appinstalled', () => {
+      deferredInstallPrompt = null;
+      hidePwaInstallToast();
+      if (headerInstallBtn) headerInstallBtn.classList.add('hidden');
+      showToast('অভিনন্দন! Vocational Intelligence অ্যাপটি ইনস্টল সম্পন্ন হয়েছে।');
+    });
+
+    // 4. Bind button clicks
+    if (headerInstallBtn) {
+      headerInstallBtn.addEventListener('click', triggerPwaInstall);
+    }
+    if (toastInstallBtn) {
+      toastInstallBtn.addEventListener('click', triggerPwaInstall);
+    }
+    if (toastCloseBtn) {
+      toastCloseBtn.addEventListener('click', hidePwaInstallToast);
+    }
+
+    // Pause auto-dismiss timer when user hovers/touches the install toast
+    if (toastEl) {
+      toastEl.addEventListener('mouseenter', () => {
+        if (installToastTimer) {
+          clearTimeout(installToastTimer);
+          installToastTimer = null;
+        }
+        if (progressEl) {
+          progressEl.style.transition = 'none';
+          progressEl.style.width = '100%';
+        }
+      });
+      toastEl.addEventListener('mouseleave', () => {
+        showPwaInstallToast(20000);
+      });
+    }
+
+    // 5. On launch, immediately show the long-duration install toast (30 seconds)
+    if (!isRunningStandalone()) {
+      setTimeout(() => {
+        showPwaInstallToast(30000);
+      }, 600);
+    }
   }
 
   // Boot application

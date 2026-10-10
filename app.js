@@ -1908,8 +1908,152 @@
       if (e.key === 'Escape') {
         closeModal('analytics-modal');
         closeModal('import-modal');
+        hidePwaInstallToast();
       }
     });
+
+    initPwaInstallFeature();
+  }
+
+  // PWA Service Worker & Long-Duration Launch Install Toast
+  let deferredInstallPrompt = null;
+  let installToastTimer = null;
+
+  function isRunningStandalone() {
+    return (
+      window.matchMedia('(display-mode: standalone)').matches ||
+      window.navigator.standalone === true
+    );
+  }
+
+  function showPwaInstallToast(durationMs = 30000) {
+    if (isRunningStandalone()) return;
+    const toastEl = document.getElementById('pwa-install-toast');
+    const progressEl = document.getElementById('pwa-install-progress');
+    if (!toastEl) return;
+
+    toastEl.classList.remove('translate-y-28', 'opacity-0', 'pointer-events-none');
+    toastEl.classList.add('translate-y-0', 'opacity-100');
+
+    if (progressEl) {
+      progressEl.style.transition = 'none';
+      progressEl.style.width = '100%';
+      // Trigger reflow then animate width to 0 over durationMs
+      void progressEl.offsetWidth;
+      progressEl.style.transition = `width ${durationMs}ms linear`;
+      progressEl.style.width = '0%';
+    }
+
+    if (installToastTimer) clearTimeout(installToastTimer);
+    installToastTimer = setTimeout(() => {
+      hidePwaInstallToast();
+    }, durationMs);
+  }
+
+  function hidePwaInstallToast() {
+    const toastEl = document.getElementById('pwa-install-toast');
+    if (!toastEl) return;
+    toastEl.classList.add('translate-y-28', 'opacity-0', 'pointer-events-none');
+    toastEl.classList.remove('translate-y-0', 'opacity-100');
+    if (installToastTimer) {
+      clearTimeout(installToastTimer);
+      installToastTimer = null;
+    }
+  }
+
+  async function triggerPwaInstall() {
+    if (deferredInstallPrompt) {
+      try {
+        deferredInstallPrompt.prompt();
+        const choiceResult = await deferredInstallPrompt.userChoice;
+        if (choiceResult.outcome === 'accepted') {
+          hidePwaInstallToast();
+          showToast('Vocational Intelligence সফলভাবে ইনস্টল হচ্ছে!');
+        }
+        deferredInstallPrompt = null;
+      } catch (err) {
+        console.error('Install prompt error:', err);
+      }
+    } else {
+      // Fallback guidance if browser hasn't fired beforeinstallprompt yet
+      showToast('ব্রাউজারের ⋮ মেনু বা অ্যাড্রেস বারের ইনস্টল আইকন থেকে "Install app" বা "Add to Home screen"-এ ক্লিক করুন');
+    }
+  }
+
+  function initPwaInstallFeature() {
+    // 1. Register Service Worker for Chrome PWA Installability
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js', { scope: './' }).catch(err => {
+          console.warn('SW registration notice:', err);
+        });
+      });
+    }
+
+    const headerInstallBtn = document.getElementById('header-install-btn');
+    const toastInstallBtn = document.getElementById('pwa-toast-install-btn');
+    const toastCloseBtn = document.getElementById('pwa-toast-close-btn');
+    const toastEl = document.getElementById('pwa-install-toast');
+    const progressEl = document.getElementById('pwa-install-progress');
+
+    if (isRunningStandalone() && headerInstallBtn) {
+      headerInstallBtn.classList.add('hidden');
+    }
+
+    // 2. Capture Chrome's beforeinstallprompt event
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredInstallPrompt = e;
+      if (headerInstallBtn) {
+        headerInstallBtn.classList.remove('hidden');
+        headerInstallBtn.classList.add('inline-flex');
+      }
+      // Show or refresh the long-duration install toast (30 seconds)
+      showPwaInstallToast(30000);
+    });
+
+    // 3. Hide install UI once installed
+    window.addEventListener('appinstalled', () => {
+      deferredInstallPrompt = null;
+      hidePwaInstallToast();
+      if (headerInstallBtn) headerInstallBtn.classList.add('hidden');
+      showToast('অভিনন্দন! Vocational Intelligence অ্যাপটি ইনস্টল সম্পন্ন হয়েছে।');
+    });
+
+    // 4. Bind button clicks
+    if (headerInstallBtn) {
+      headerInstallBtn.addEventListener('click', triggerPwaInstall);
+    }
+    if (toastInstallBtn) {
+      toastInstallBtn.addEventListener('click', triggerPwaInstall);
+    }
+    if (toastCloseBtn) {
+      toastCloseBtn.addEventListener('click', hidePwaInstallToast);
+    }
+
+    // Pause auto-dismiss timer when user hovers/touches the install toast
+    if (toastEl) {
+      toastEl.addEventListener('mouseenter', () => {
+        if (installToastTimer) {
+          clearTimeout(installToastTimer);
+          installToastTimer = null;
+        }
+        if (progressEl) {
+          progressEl.style.transition = 'none';
+          progressEl.style.width = '100%';
+        }
+      });
+      toastEl.addEventListener('mouseleave', () => {
+        showPwaInstallToast(20000);
+      });
+    }
+
+    // 5. On launch, immediately show the long-duration install toast (30 seconds)
+    if (!isRunningStandalone()) {
+      setTimeout(() => {
+        showPwaInstallToast(30000);
+      }, 600);
+    }
   }
 
   // Boot application
